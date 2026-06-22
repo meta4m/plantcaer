@@ -10,14 +10,14 @@ const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
  * Check whether PIN mode is active.
  * PIN mode is activated by setting the APP_PIN environment variable.
  */
-export function isPinMode(): boolean {
+export async function isPinMode(): Promise<boolean> {
   return !!process.env.APP_PIN;
 }
 
 /**
  * Validate a PIN against the APP_PIN environment variable.
  */
-export function validatePin(pin: string): boolean {
+export async function validatePin(pin: string): Promise<boolean> {
   if (!process.env.APP_PIN) return false;
   return pin === process.env.APP_PIN;
 }
@@ -40,7 +40,7 @@ function generateToken(): string {
 /**
  * Verify a PIN token and return whether it's valid.
  */
-export function verifyToken(token: string): boolean {
+export async function verifyToken(token: string): Promise<boolean> {
   try {
     const parts = token.split('.');
     if (parts.length !== 3) return false;
@@ -66,7 +66,7 @@ export function verifyToken(token: string): boolean {
  * Returns true if the cookie was set.
  */
 export async function setPinCookie(): Promise<boolean> {
-  if (!isPinMode()) return false;
+  if (!await isPinMode()) return false;
 
   const cookieStore = await cookies();
   const token = generateToken();
@@ -86,13 +86,13 @@ export async function setPinCookie(): Promise<boolean> {
  * Check if the current request has a valid PIN cookie.
  */
 export async function hasValidPinCookie(): Promise<boolean> {
-  if (!isPinMode()) return false;
+  if (!await isPinMode()) return false;
 
   const cookieStore = await cookies();
   const token = cookieStore.get(COOKIE_NAME)?.value;
   if (!token) return false;
 
-  return verifyToken(token);
+  return await verifyToken(token);
 }
 
 /**

@@ -35,7 +35,7 @@ export async function getAuthedUser(
   if (isPinMode) {
     const cookieStore = await cookies();
     const pinCookie = cookieStore.get('plantcaer_pin')?.value;
-    if (!pinCookie || !verifyToken(pinCookie)) return null;
+    if (!pinCookie || !await verifyToken(pinCookie)) return null;
 
     // PIN is valid — use a household user
     const householdId = process.env.HOUSEHOLD_USER_ID;

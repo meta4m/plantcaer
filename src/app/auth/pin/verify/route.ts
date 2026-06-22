@@ -12,7 +12,7 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!validatePin(pin)) {
+    if (!await validatePin(pin)) {
       return NextResponse.json(
         { success: false, error: 'Incorrect PIN' },
         { status: 401 }
