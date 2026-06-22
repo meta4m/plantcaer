@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase-server';
 import { redirect, notFound } from 'next/navigation';
 import { PlantDetailContent } from '@/components/plant-detail-content';
+import { getAuthedUser } from '@/lib/get-user';
 
 export default async function PlantDetailPage({
   params,
@@ -9,7 +10,7 @@ export default async function PlantDetailPage({
 }) {
   const { slug } = await params;
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getAuthedUser(supabase);
   if (!user) redirect('/auth/login');
 
   const { data: plant } = await supabase
@@ -40,6 +41,13 @@ export default async function PlantDetailPage({
     .order('created_at', { ascending: false })
     .limit(20);
 
+  // Fetch photos for this plant
+  const { data: photos } = await supabase
+    .from('plant_photos')
+    .select('*')
+    .eq('plant_id', plant.id)
+    .order('uploaded_at', { ascending: false });
+
   const isOwner = plant.owner_id === user.id;
 
   return (
@@ -48,6 +56,7 @@ export default async function PlantDetailPage({
       careTasks={careTasks ?? []}
       careLogs={careLogs ?? []}
       journalEntries={journalEntries ?? []}
+      photos={photos ?? []}
       isOwner={isOwner}
     />
   );

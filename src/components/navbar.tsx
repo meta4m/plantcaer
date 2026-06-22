@@ -21,6 +21,19 @@ export function Navbar() {
   }, [supabase]);
 
   const handleSignOut = async () => {
+    // Check if PIN mode is active
+    const isPinMode = document.cookie.includes('plantcaer_pin');
+
+    if (isPinMode) {
+      await fetch('/auth/pin/verify', {
+        method: 'DELETE',
+      });
+      setUser(null);
+      router.push('/auth/pin');
+      router.refresh();
+      return;
+    }
+
     await supabase.auth.signOut();
     setUser(null);
     router.push('/auth/login');
@@ -34,6 +47,7 @@ export function Navbar() {
     { href: '/', label: 'Dashboard' },
     { href: '/plants', label: 'Plants' },
     { href: '/care', label: 'Care' },
+    { href: '/plants/qr-print', label: 'Stickers' },
   ];
 
   return (

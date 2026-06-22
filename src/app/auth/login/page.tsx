@@ -1,6 +1,11 @@
 import { AuthForm } from '@/components/auth-form';
+import { isPinMode } from '@/lib/get-user';
+import { redirect } from 'next/navigation';
 
 export default function LoginPage() {
+  if (isPinMode()) {
+    redirect('/auth/pin');
+  }
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
       <div className="w-full max-w-sm">

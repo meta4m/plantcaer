@@ -11,9 +11,10 @@ interface DashboardContentProps {
   careLogs: CareLog[];
   careTasks: CareTask[];
   userEmail: string;
+  primaryPhotoMap?: Record<string, string>;
 }
 
-export function DashboardContent({ plants, careLogs, careTasks }: DashboardContentProps) {
+export function DashboardContent({ plants, careLogs, careTasks, primaryPhotoMap = {} }: DashboardContentProps) {
   const totalPlants = plants.length;
   const activeTasks = careTasks.length;
   const [today] = useState(() => new Date());
@@ -204,7 +205,7 @@ export function DashboardContent({ plants, careLogs, careTasks }: DashboardConte
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {plants.map((plant) => (
-              <PlantCard key={plant.id} plant={plant} />
+              <PlantCard key={plant.id} plant={plant} primaryPhotoUrl={primaryPhotoMap[plant.id] ?? null} />
             ))}
           </div>
         )}

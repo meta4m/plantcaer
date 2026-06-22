@@ -254,10 +254,41 @@ Use the admin credentials:
 | `/plant/[slug]` | **Plant Details** | Full plant info, care tasks, care log, journal, **QR code** |
 | `/plant/[slug]/edit` | **Edit Plant** | Edit the plant's details |
 | `/care` | **Care Overview** | All active care tasks grouped by plant with log buttons |
-| `/auth/login` | **Login** | Sign in with email/password |
-| `/auth/signup` | **Sign Up** | Create a new account |
+| `/auth/login` | **Login** | Sign in with email/password (redirects to PIN if `APP_PIN` is set) |
+| `/auth/signup` | **Sign Up** | Create a new account (redirects to PIN if `APP_PIN` is set) |
+| `/auth/pin` | **PIN Entry** | Household PIN login (only when `APP_PIN` is configured) |
+| `/plants/qr-print` | **QR Stickers** | Printable QR code pot sticker sheet |
 
 ### Key Features
+
+#### AI Plant Identification
+- Snap a photo on the Add Plant page
+- Select the photo and click **"AI Identify Plant from Photo"**
+- AI identifies the species and suggests care data
+- Review AI suggestions and click **"Apply Suggestions"** to auto-fill the form
+- Care tasks are automatically created when you save the plant
+- Supports Google Gemini, Groq, OpenAI, and Anthropic
+
+#### QR Code Pot Stickers
+- Each plant detail page shows a **QR code** linking directly to that plant
+- **Download PNG** button to save individual QR codes
+- Visit `/plants/qr-print` for a **printable sticker sheet** — prints 4 per page
+- QR codes encode the full URL: `https://plantcaer.vercel.app/plant/{slug}`
+- Great for attaching to pots so anyone can scan to see care info
+
+#### Copy-as-Prompt
+- On any plant detail page, click **"Copy as Prompt"**
+- Copies a formatted plant care summary to your clipboard
+- Paste into ChatGPT, Gemini, or Claude to validate care recommendations
+- Includes species, light, temperature, humidity, and care schedule
+
+#### PIN Mode (Household Access)
+- Set `APP_PIN` in `.env.local` to enable PIN-based access
+- Replaces the login/signup flow with a simple 4-6 digit PIN
+- Great for families — one shared PIN for everyone
+- PIN entry has an on-screen numpad with show/hide option
+- Signed, nonce-protected cookie (7-day session)
+- Skip PIN mode entirely by omitting `APP_PIN` from env
 
 #### Dashboard
 - Stats cards: total plants, active tasks, overdue tasks, total logs
@@ -267,15 +298,49 @@ Use the admin credentials:
 
 #### Plant Detail Page
 - Plant info card (name, location, light, temperature, humidity)
+- Photo gallery with lightbox, set primary, delete
 - Care tasks list with log buttons (✅ Mark as Done)
 - Care log — history of all care performed
 - Journal entries — add notes about the plant
-- QR code button (planned — see MVP-REQUIREMENTS.md)
+- QR code pot sticker with download
+- Copy-as-Prompt button
 
 #### Care Overview
 - All plants with their care tasks grouped together
 - Log care directly from this page
 - Visual indicators for overdue tasks
+
+#### Photo Gallery
+- Upload photos on the Add Plant form or from the plant detail page
+- Auto-compressed client-side (max 1920px, JPEG quality 0.8)
+- Lightbox viewer with swipe/arrow navigation
+- Set any photo as the primary thumbnail
+- Delete photos you don't want
+
+### Photo Upload
+
+Photos are **automatically compressed** client-side before upload:
+- Resized to max **1920px** on the longest side
+- Compressed to **JPEG quality 0.8**
+- Only replaces original if compressed is smaller
+- HEIC/HEIF and small files pass through unchanged
+- All uploads go to Supabase Storage (`plant-photos` bucket)
+
+### PIN Mode Setup
+
+```bash
+# In .env.local — set a 4-6 digit PIN to enable household mode
+APP_PIN=1234
+
+# Optional: specify which user owns the data (defaults to first profile)
+HOUSEHOLD_USER_ID=replace-with-actual-user-uuid
+```
+
+When `APP_PIN` is set:
+- `/auth/login` and `/auth/signup` redirect to `/auth/pin`
+- Middleware protects all routes with the PIN
+- The navbar shows a sign-out button that clears the PIN cookie
+- PIN cookie lasts 7 days; re-enter after that
 
 ### Glassmorphism Theme
 

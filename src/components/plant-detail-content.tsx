@@ -1,6 +1,6 @@
 'use client';
 
-import type { Plant, CareTask, CareLog, JournalEntry, TaskType } from '@/lib/types';
+import type { Plant, CareTask, CareLog, JournalEntry, PlantPhoto, TaskType } from '@/lib/types';
 import {
   TASK_TYPE_ICONS,
   TASK_TYPE_LABELS,
@@ -10,12 +10,17 @@ import { useState } from 'react';
 import { createClient } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { PhotoGallery } from './photo-gallery';
+import { getPhotoUrl } from '@/lib/storage';
+import { QRCode } from './qr-code';
+import { CopyAsPrompt } from './copy-as-prompt';
 
 interface PlantDetailContentProps {
   plant: Plant;
   careTasks: CareTask[];
   careLogs: CareLog[];
   journalEntries: (JournalEntry & { profiles?: { display_name: string | null; avatar_url: string | null } })[];
+  photos: PlantPhoto[];
   isOwner: boolean;
 }
 
@@ -24,6 +29,7 @@ export function PlantDetailContent({
   careTasks,
   careLogs,
   journalEntries,
+  photos,
   isOwner,
 }: PlantDetailContentProps) {
   const router = useRouter();
@@ -32,6 +38,9 @@ export function PlantDetailContent({
   const [journalText, setJournalText] = useState('');
   const [savingJournal, setSavingJournal] = useState(false);
   const [now] = useState(Date.now);
+  const [photosKey, setPhotosKey] = useState(0);
+
+  const primaryPhoto = photos.find((p) => p.is_primary);
 
   const handleLogCare = async (taskId: string, taskType: TaskType) => {
     setLoggingTask(taskId);
@@ -83,7 +92,18 @@ export function PlantDetailContent({
       <div className="glass-card rounded-2xl p-6 sm:p-8">
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-4">
-            <span className="text-4xl">🪴</span>
+            {/* Primary photo or placeholder */}
+            {primaryPhoto ? (
+              <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
+                <img
+                  src={getPhotoUrl(primaryPhoto.url)}
+                  alt={plant.nickname || plant.common_name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ) : (
+              <span className="text-4xl">🪴</span>
+            )}
             <div>
               <h1 className="text-3xl font-bold text-white">
                 {plant.nickname || plant.common_name}
@@ -98,14 +118,19 @@ export function PlantDetailContent({
               )}
             </div>
           </div>
-          {isOwner && (
-            <Link
-              href={`/plant/${plant.slug}/edit`}
-              className="glass-card rounded-xl px-4 py-2 text-sm text-white/60 hover:text-white hover:bg-white/10 transition-all"
-            >
-              Edit
-            </Link>
-          )}
+          <div className="flex items-center gap-2">
+            <CopyAsPrompt plant={plant} careTasks={careTasks} />
+            {isOwner && (
+              <>
+                <Link
+                  href={`/plant/${plant.slug}/edit`}
+                  className="glass-card rounded-xl px-4 py-2 text-sm text-white/60 hover:text-white hover:bg-white/10 transition-all"
+                >
+                  Edit
+                </Link>
+              </>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
@@ -146,6 +171,29 @@ export function PlantDetailContent({
             <p className="text-sm text-white/50">{plant.notes}</p>
           </div>
         )}
+      </div>
+
+      {/* Photo Gallery + QR Code */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <PhotoGallery
+            key={photosKey}
+            plantId={plant.id}
+            photos={photos}
+            onPhotosChanged={() => {
+              setPhotosKey((k) => k + 1);
+              router.refresh();
+            }}
+          />
+        </div>
+        <div>
+          <div className="glass-card rounded-2xl p-4">
+            <h3 className="text-xs font-medium text-white/40 uppercase tracking-wider mb-3">
+              Pot Sticker QR
+            </h3>
+            <QRCode slug={plant.slug} plantName={plant.nickname || plant.common_name} compact={false} />
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

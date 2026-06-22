@@ -1,10 +1,11 @@
 import { createClient } from '@/lib/supabase-server';
 import { redirect } from 'next/navigation';
 import { CareContent } from '@/components/care-content';
+import { getAuthedUser } from '@/lib/get-user';
 
 export default async function CarePage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getAuthedUser(supabase);
   if (!user) redirect('/auth/login');
 
   const { data: plants } = await supabase

@@ -2,14 +2,44 @@
 
 import { createClient } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { slugify, LIGHT_REQUIREMENT_LABELS, type LightRequirement } from '@/lib/types';
+import { PhotoUpload } from '@/components/photo-upload';
+import { uploadPlantPhoto } from '@/lib/storage';
+import { identifyPlantAction } from '@/app/actions/identify-plant';
+import { Sparkles, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import type { AiPlantSuggestion } from '@/lib/ai/types';
+
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      // Strip the data:image/...;base64, prefix
+      const base64 = result.split(',')[1];
+      resolve(base64);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
 export default function AddPlantPage() {
   const router = useRouter();
   const supabase = createClient();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoUploading, setPhotoUploading] = useState(false);
+  const [photoError, setPhotoError] = useState<string | null>(null);
+
+  // AI identify states
+  const [aiIdentifying, setAiIdentifying] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+  const [aiResult, setAiResult] = useState<AiPlantSuggestion | null>(null);
+  const [aiApplied, setAiApplied] = useState(false);
 
   const [formData, setFormData] = useState({
     common_name: '',
@@ -28,6 +58,81 @@ export default function AddPlantPage() {
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
+
+  const handlePhotoSelect = (file: File) => {
+    setSelectedPhoto(file);
+    setPhotoPreview(URL.createObjectURL(file));
+    setPhotoError(null);
+    setAiResult(null);
+    setAiApplied(false);
+    setAiError(null);
+  };
+
+  // Cleanup object URL on unmount
+  useEffect(() => {
+    return () => {
+      if (photoPreview) URL.revokeObjectURL(photoPreview);
+    };
+  }, [photoPreview]);
+
+  const handlePhotoClear = () => {
+    setSelectedPhoto(null);
+    if (photoPreview) URL.revokeObjectURL(photoPreview);
+    setPhotoPreview(null);
+    setPhotoError(null);
+    setAiResult(null);
+    setAiApplied(false);
+    setAiError(null);
+  };
+
+  const handleAiIdentify = useCallback(async () => {
+    if (!selectedPhoto) return;
+
+    setAiIdentifying(true);
+    setAiError(null);
+    setAiResult(null);
+
+    try {
+      const base64 = await fileToBase64(selectedPhoto);
+      const result = await identifyPlantAction(base64, selectedPhoto.type);
+
+      if (result.error) {
+        setAiError(result.error);
+        return;
+      }
+
+      if (!result.data) {
+        setAiError('AI returned no data. Please try again.');
+        return;
+      }
+
+      setAiResult(result.data);
+    } catch (err) {
+      setAiError(err instanceof Error ? err.message : 'Failed to identify plant');
+    } finally {
+      setAiIdentifying(false);
+    }
+  }, [selectedPhoto]);
+
+  const applyAiSuggestion = useCallback(() => {
+    if (!aiResult) return;
+
+    setFormData({
+      common_name: aiResult.common_name || '',
+      scientific_name: aiResult.scientific_name || '',
+      nickname: '',
+      species: '',
+      location: '',
+      adopted_at: formData.adopted_at,
+      light_requirement: aiResult.light_requirement || '',
+      min_temp: aiResult.min_temp ? String(aiResult.min_temp) : '',
+      max_temp: aiResult.max_temp ? String(aiResult.max_temp) : '',
+      humidity_min: aiResult.humidity_min ? String(aiResult.humidity_min) : '',
+      notes: aiResult.notes || '',
+    });
+
+    setAiApplied(true);
+  }, [aiResult, formData.adopted_at]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,6 +170,36 @@ export default function AddPlantPage() {
 
       if (insertError) throw insertError;
 
+      // Upload photo if one was selected
+      if (selectedPhoto && plant) {
+        setPhotoUploading(true);
+        const result = await uploadPlantPhoto(supabase, selectedPhoto, plant.id, user.id);
+        if (result.error) {
+          setPhotoError(result.error);
+        } else {
+          await supabase.from('plant_photos').insert({
+            plant_id: plant.id,
+            url: result.url,
+            is_primary: true,
+          });
+        }
+        setPhotoUploading(false);
+      }
+
+      // If AI provided care tasks, create them
+      if (aiResult?.care_tasks && aiResult.care_tasks.length > 0 && plant) {
+        for (const task of aiResult.care_tasks) {
+          await supabase.from('care_tasks').insert({
+            plant_id: plant.id,
+            task_type: task.task_type,
+            frequency_days: task.frequency_days || 7,
+            amount: task.amount || null,
+            notes: task.notes || null,
+            is_active: true,
+          });
+        }
+      }
+
       router.push(`/plant/${plant.slug}`);
       router.refresh();
     } catch (err) {
@@ -87,6 +222,132 @@ export default function AddPlantPage() {
             {error}
           </div>
         )}
+
+        {/* Photo upload + AI identify */}
+        <div className="space-y-3">
+          <PhotoUpload
+            onFileSelect={handlePhotoSelect}
+            onFileClear={handlePhotoClear}
+            previewUrl={photoPreview}
+            uploading={photoUploading}
+            error={photoError}
+            plantName={formData.common_name || undefined}
+          />
+
+          {/* AI Identify button */}
+          {selectedPhoto && !aiIdentifying && !aiResult && (
+            <button
+              type="button"
+              onClick={handleAiIdentify}
+              className="w-full flex items-center justify-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2.5 text-sm font-medium text-emerald-300 hover:bg-emerald-500/20 hover:text-emerald-200 transition-all"
+            >
+              <Sparkles className="h-4 w-4" />
+              AI Identify Plant from Photo
+            </button>
+          )}
+
+          {/* AI identifying state */}
+          {aiIdentifying && (
+            <div className="flex items-center justify-center gap-2 rounded-xl bg-white/5 px-4 py-3 text-sm text-white/60">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Identifying plant with AI...
+            </div>
+          )}
+
+          {/* AI error */}
+          {aiError && (
+            <div className="flex items-start gap-2 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
+              <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+              <div>
+                <p className="font-medium">AI identification failed</p>
+                <p className="text-red-300/70 mt-0.5">{aiError}</p>
+                <button
+                  type="button"
+                  onClick={handleAiIdentify}
+                  className="mt-1.5 text-xs text-red-300 hover:text-red-200 underline underline-offset-2 transition-colors"
+                >
+                  Try again
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* AI result preview */}
+          {aiResult && !aiApplied && (
+            <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-emerald-400" />
+                <p className="text-sm font-medium text-emerald-300">AI identified this plant as:</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div>
+                  <span className="text-xs text-white/40">Name</span>
+                  <p className="text-white font-medium">{aiResult.common_name}</p>
+                </div>
+                {aiResult.scientific_name && (
+                  <div>
+                    <span className="text-xs text-white/40">Scientific</span>
+                    <p className="text-white/80 italic">{aiResult.scientific_name}</p>
+                  </div>
+                )}
+                {aiResult.light_requirement && (
+                  <div>
+                    <span className="text-xs text-white/40">Light</span>
+                    <p className="text-white">{LIGHT_REQUIREMENT_LABELS[aiResult.light_requirement]}</p>
+                  </div>
+                )}
+                <div>
+                  <span className="text-xs text-white/40">Temperature</span>
+                  <p className="text-white">{aiResult.min_temp}°C – {aiResult.max_temp}°C</p>
+                </div>
+                <div>
+                  <span className="text-xs text-white/40">Humidity</span>
+                  <p className="text-white">{aiResult.humidity_min}%+</p>
+                </div>
+                <div>
+                  <span className="text-xs text-white/40">Care tasks</span>
+                  <p className="text-white">{aiResult.care_tasks?.length || 0} tasks suggested</p>
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={applyAiSuggestion}
+                  className="flex-1 rounded-xl bg-emerald-500 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-400 transition-all active:scale-[0.98]"
+                >
+                  Apply Suggestions
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAiResult(null)}
+                  className="rounded-xl border border-white/10 px-3 py-2 text-xs text-white/50 hover:text-white hover:bg-white/5 transition-all"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* AI applied confirmation */}
+          {aiApplied && (
+            <div className="flex items-center gap-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-3 text-sm text-emerald-300">
+              <CheckCircle2 className="h-4 w-4" />
+              AI suggestions applied! Review and adjust the fields below.
+              <button
+                type="button"
+                onClick={() => {
+                  setAiApplied(false);
+                  setAiResult(null);
+                }}
+                className="ml-auto text-xs text-emerald-400/60 hover:text-emerald-300 underline underline-offset-2"
+              >
+                Undo
+              </button>
+            </div>
+          )}
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="sm:col-span-2">

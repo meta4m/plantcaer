@@ -3,10 +3,11 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { PlantCard } from '@/components/plant-card';
 import { Plus } from 'lucide-react';
+import { getAuthedUser } from '@/lib/get-user';
 
 export default async function PlantsPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getAuthedUser(supabase);
   if (!user) redirect('/auth/login');
 
   const { data: plants } = await supabase
@@ -14,6 +15,23 @@ export default async function PlantsPage() {
     .select('*')
     .eq('owner_id', user.id)
     .order('created_at', { ascending: false });
+
+  const plantIds = plants?.map((p) => p.id) ?? [];
+
+  // Fetch primary photos for all plants
+  const { data: allPhotos } = plantIds.length > 0
+    ? await supabase
+        .from('plant_photos')
+        .select('plant_id, url')
+        .in('plant_id', plantIds)
+        .eq('is_primary', true)
+    : { data: [] };
+
+  // Build a map of plant_id -> primary photo URL
+  const primaryPhotoMap: Record<string, string> = {};
+  for (const photo of allPhotos ?? []) {
+    primaryPhotoMap[photo.plant_id] = photo.url;
+  }
 
   return (
     <div className="space-y-6">
@@ -51,7 +69,11 @@ export default async function PlantsPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {plants.map((plant) => (
-            <PlantCard key={plant.id} plant={plant} />
+            <PlantCard
+              key={plant.id}
+              plant={plant}
+              primaryPhotoUrl={primaryPhotoMap[plant.id] ?? null}
+            />
           ))}
         </div>
       )}
