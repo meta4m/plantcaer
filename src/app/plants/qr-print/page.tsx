@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase-server';
+import { createDataClient } from '@/lib/data-client';
 import { redirect } from 'next/navigation';
 import { QRPrintContent } from '@/components/qr-print-content';
 import { getAuthedUser } from '@/lib/get-user';
@@ -8,7 +9,9 @@ export default async function QRPrintPage() {
   const user = await getAuthedUser(supabase);
   if (!user) redirect('/auth/login');
 
-  const { data: plants } = await supabase
+  const db = await createDataClient();
+
+  const { data: plants } = await db
     .from('plants')
     .select('slug, common_name, nickname')
     .eq('owner_id', user.id)

@@ -11,6 +11,52 @@ import {
   type CareTask,
 } from '@/lib/types';
 
+/** Get PIN token from cookie (httpOnly: false, readable by client JS) */
+function getPinToken(): string | null {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.match(/(?:^|;\s*)plantcaer_pin=([^;]*)/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+/** Fetch plant data — uses API route for PIN mode, Supabase client for regular auth */
+async function fetchPlantData(slug: string): Promise<{
+  plant: Record<string, unknown>;
+  careTasks: CareTask[];
+} | null> {
+  // Try API route first (works with PIN cookie via Authorization header or cookies)
+  try {
+    const headers: Record<string, string> = {};
+    const pinToken = getPinToken();
+    if (pinToken) {
+      headers['Authorization'] = `Bearer ${pinToken}`;
+    }
+    const res = await fetch(`/api/plant/${slug}`, { headers });
+    if (res.ok) {
+      const data = await res.json();
+      return { plant: data.plant, careTasks: data.careTasks ?? [] };
+    }
+  } catch {
+    // Fall through to Supabase client
+  }
+
+  // Fallback: direct Supabase query (requires Supabase session)
+  const supabase = createClient();
+  const { data: plant } = await supabase
+    .from('plants')
+    .select('*')
+    .eq('slug', slug)
+    .single();
+
+  if (!plant) return null;
+
+  const { data: tasks } = await supabase
+    .from('care_tasks')
+    .select('*')
+    .eq('plant_id', plant.id);
+
+  return { plant, careTasks: (tasks ?? []) as CareTask[] };
+}
+
 export default function EditPlantPage({
   params,
 }: {
@@ -43,35 +89,28 @@ export default function EditPlantPage({
   useEffect(() => {
     const fetchPlant = async () => {
       const slug = (await params).slug;
-      const { data: plant } = await supabase
-        .from('plants')
-        .select('*')
-        .eq('slug', slug)
-        .single();
+      const result = await fetchPlantData(slug);
 
-      if (!plant) {
+      if (!result) {
         router.push('/plants');
         return;
       }
 
-      setFormData({
-        common_name: plant.common_name || '',
-        scientific_name: plant.scientific_name || '',
-        nickname: plant.nickname || '',
-        species: plant.species || '',
-        location: plant.location || '',
-        adopted_at: plant.adopted_at || '',
-        light_requirement: (plant.light_requirement as LightRequirement) || '',
-        min_temp: plant.min_temp?.toString() || '',
-        max_temp: plant.max_temp?.toString() || '',
-        humidity_min: plant.humidity_min?.toString() || '',
-        notes: plant.notes || '',
-      });
+      const { plant, careTasks: tasks } = result;
 
-      const { data: tasks } = await supabase
-        .from('care_tasks')
-        .select('*')
-        .eq('plant_id', plant.id);
+      setFormData({
+        common_name: (plant.common_name as string) || '',
+        scientific_name: (plant.scientific_name as string) || '',
+        nickname: (plant.nickname as string) || '',
+        species: (plant.species as string) || '',
+        location: (plant.location as string) || '',
+        adopted_at: (plant.adopted_at as string) || '',
+        light_requirement: (plant.light_requirement as LightRequirement) || '',
+        min_temp: (plant.min_temp?.toString()) || '',
+        max_temp: (plant.max_temp?.toString()) || '',
+        humidity_min: (plant.humidity_min?.toString()) || '',
+        notes: (plant.notes as string) || '',
+      });
 
       if (tasks) {
         setCareTasks(
@@ -88,7 +127,7 @@ export default function EditPlantPage({
     };
 
     fetchPlant();
-  }, [params, supabase, router]);
+  }, [params, router]);
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -129,10 +168,50 @@ export default function EditPlantPage({
 
     try {
       const slug = (await params).slug;
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
 
-      // Get plant ID
+      // Try API route first (works with PIN cookie via Authorization header)
+      const putHeaders: Record<string, string> = { 'Content-Type': 'application/json' };
+      const pinToken = getPinToken();
+      if (pinToken) {
+        putHeaders['Authorization'] = `Bearer ${pinToken}`;
+      }
+      const res = await fetch(`/api/plant/${slug}`, {
+        method: 'PUT',
+        headers: putHeaders,
+        body: JSON.stringify({
+          common_name: formData.common_name,
+          scientific_name: formData.scientific_name || null,
+          nickname: formData.nickname || null,
+          species: formData.species || null,
+          location: formData.location || null,
+          adopted_at: formData.adopted_at || null,
+          light_requirement: (formData.light_requirement as LightRequirement) || null,
+          min_temp: formData.min_temp ? parseFloat(formData.min_temp) : null,
+          max_temp: formData.max_temp ? parseFloat(formData.max_temp) : null,
+          humidity_min: formData.humidity_min ? parseInt(formData.humidity_min) : null,
+          notes: formData.notes || null,
+          careTasks: careTasks.map(t => ({
+            task_type: t.task_type,
+            frequency_days: t.frequency_days,
+            amount: t.amount,
+            notes: t.notes,
+          })),
+        }),
+      });
+
+      if (res.ok) {
+        router.push(`/plant/${slug}`);
+        router.refresh();
+        return;
+      }
+
+      // Fallback: direct Supabase mutation (requires Supabase session)
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        const errData = await res.json();
+        throw new Error(errData.error || 'Not authenticated');
+      }
+
       const { data: plant } = await supabase
         .from('plants')
         .select('id')
@@ -140,7 +219,6 @@ export default function EditPlantPage({
         .single();
       if (!plant) throw new Error('Plant not found');
 
-      // Update plant
       const { error: updateError } = await supabase
         .from('plants')
         .update({
@@ -161,7 +239,6 @@ export default function EditPlantPage({
 
       if (updateError) throw updateError;
 
-      // Upsert care tasks
       for (const task of careTasks) {
         if (task.frequency_days) {
           const { error: taskError } = await supabase.from('care_tasks').upsert(
