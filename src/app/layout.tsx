@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
+import { ServiceWorkerRegistration } from "@/components/service-worker-registration";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,6 +43,10 @@ export default function RootLayout({
     >
       <head>
         <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/icon-192.svg" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Plantcaer" />
       </head>
       <body
         className="min-h-full antialiased"
@@ -57,6 +62,7 @@ export default function RootLayout({
           color: '#e2e8f0',
         }}>
         <Navbar />
+        <ServiceWorkerRegistration />
         <main className="mx-auto max-w-6xl px-4 pb-12 pt-6">
           {children}
         </main>
