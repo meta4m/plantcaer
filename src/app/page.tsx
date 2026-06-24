@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase-server';
+import { createDataClient } from '@/lib/data-client';
 import { redirect } from 'next/navigation';
 import { DashboardContent } from '@/components/dashboard-content';
 import { getAuthedUser } from '@/lib/get-user';
@@ -11,7 +12,9 @@ export default async function DashboardPage() {
     redirect('/auth/login');
   }
 
-  const { data: plants } = await supabase
+  const db = await createDataClient();
+
+  const { data: plants } = await db
     .from('plants')
     .select('*')
     .eq('owner_id', user.id)
@@ -19,14 +22,14 @@ export default async function DashboardPage() {
 
   const plantIds = plants?.map((p) => p.id) ?? [];
 
-  const { data: careLogs } = await supabase
+  const { data: careLogs } = await db
     .from('care_logs')
     .select('*')
     .in('plant_id', plantIds)
     .order('logged_at', { ascending: false })
     .limit(20);
 
-  const { data: careTasks } = await supabase
+  const { data: careTasks } = await db
     .from('care_tasks')
     .select('*')
     .in('plant_id', plantIds)
@@ -34,7 +37,7 @@ export default async function DashboardPage() {
 
   // Fetch primary photos for all plants
   const { data: allPhotos } = plantIds.length > 0
-    ? await supabase
+    ? await db
         .from('plant_photos')
         .select('plant_id, url')
         .in('plant_id', plantIds)

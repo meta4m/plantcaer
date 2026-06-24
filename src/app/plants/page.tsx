@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase-server';
+import { createDataClient } from '@/lib/data-client';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { PlantCard } from '@/components/plant-card';
@@ -10,7 +11,9 @@ export default async function PlantsPage() {
   const user = await getAuthedUser(supabase);
   if (!user) redirect('/auth/login');
 
-  const { data: plants } = await supabase
+  const db = await createDataClient();
+
+  const { data: plants } = await db
     .from('plants')
     .select('*')
     .eq('owner_id', user.id)
@@ -20,7 +23,7 @@ export default async function PlantsPage() {
 
   // Fetch primary photos for all plants
   const { data: allPhotos } = plantIds.length > 0
-    ? await supabase
+    ? await db
         .from('plant_photos')
         .select('plant_id, url')
         .in('plant_id', plantIds)

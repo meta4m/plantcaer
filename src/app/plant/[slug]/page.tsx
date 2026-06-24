@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase-server';
+import { createDataClient } from '@/lib/data-client';
 import { redirect, notFound } from 'next/navigation';
 import { PlantDetailContent } from '@/components/plant-detail-content';
 import { getAuthedUser } from '@/lib/get-user';
@@ -13,7 +14,9 @@ export default async function PlantDetailPage({
   const user = await getAuthedUser(supabase);
   if (!user) redirect('/auth/login');
 
-  const { data: plant } = await supabase
+  const db = await createDataClient();
+
+  const { data: plant } = await db
     .from('plants')
     .select('*')
     .eq('slug', slug)
@@ -21,20 +24,20 @@ export default async function PlantDetailPage({
 
   if (!plant) notFound();
 
-  const { data: careTasks } = await supabase
+  const { data: careTasks } = await db
     .from('care_tasks')
     .select('*')
     .eq('plant_id', plant.id)
     .order('task_type');
 
-  const { data: careLogs } = await supabase
+  const { data: careLogs } = await db
     .from('care_logs')
     .select('*')
     .eq('plant_id', plant.id)
     .order('logged_at', { ascending: false })
     .limit(50);
 
-  const { data: journalEntries } = await supabase
+  const { data: journalEntries } = await db
     .from('journal_entries')
     .select('*, profiles(display_name, avatar_url)')
     .eq('plant_id', plant.id)
@@ -42,7 +45,7 @@ export default async function PlantDetailPage({
     .limit(20);
 
   // Fetch photos for this plant
-  const { data: photos } = await supabase
+  const { data: photos } = await db
     .from('plant_photos')
     .select('*')
     .eq('plant_id', plant.id)
