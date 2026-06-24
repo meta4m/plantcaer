@@ -215,7 +215,17 @@ export function PlantDetailContent({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Care Schedule */}
         <div>
-          <h2 className="text-lg font-semibold text-white mb-4">Care Schedule</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-white">Care Schedule</h2>
+            {careTasks.length > 0 && (
+              <Link
+                href={`/care/calendar?plant=${plant.slug}`}
+                className="glass-card rounded-xl px-3 py-1.5 text-xs font-medium text-white/60 hover:text-white hover:bg-white/10 transition-all flex items-center gap-1.5"
+              >
+                📅 Calendar
+              </Link>
+            )}
+          </div>
           {careTasks.length === 0 ? (
             <div className="glass-card rounded-2xl p-6 text-center">
               <p className="text-white/30 text-sm mb-4">No care tasks configured yet.</p>
