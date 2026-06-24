@@ -92,9 +92,16 @@ export default function SettingsPage() {
         body: JSON.stringify({ pin: newPin }),
       });
 
-      const data = await res.json();
+      let errorMsg = 'Failed to set PIN';
+      try {
+        const data = await res.json();
+        errorMsg = data.error || errorMsg;
+      } catch {
+        errorMsg = 'Server error (invalid response)';
+      }
+
       if (!res.ok) {
-        setSaveError(data.error || 'Failed to set PIN');
+        setSaveError(errorMsg);
         return;
       }
 
@@ -105,8 +112,8 @@ export default function SettingsPage() {
       setConfirmPin('');
 
       setTimeout(() => setSaveSuccess(false), 3000);
-    } catch {
-      setSaveError('Network error. Please try again.');
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : 'Network error. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -129,8 +136,14 @@ export default function SettingsPage() {
       });
 
       if (!res.ok) {
-        const data = await res.json();
-        setSaveError(data.error || 'Failed to remove PIN');
+        let errorMsg = 'Failed to remove PIN';
+        try {
+          const data = await res.json();
+          errorMsg = data.error || errorMsg;
+        } catch {
+          errorMsg = 'Server error (invalid response)';
+        }
+        setSaveError(errorMsg);
         return;
       }
 
@@ -138,8 +151,8 @@ export default function SettingsPage() {
       setShowDeleteConfirm(false);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
-    } catch {
-      setSaveError('Network error. Please try again.');
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : 'Network error. Please try again.');
     } finally {
       setDeleting(false);
     }

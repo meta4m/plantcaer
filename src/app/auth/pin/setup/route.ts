@@ -1,10 +1,26 @@
 import { NextResponse } from 'next/server';
 import { hashPin } from '@/lib/pin-auth';
 import { createAdminClient } from '@/lib/supabase-admin';
-import { createClient } from '@/lib/supabase-server';
+
+/** Helper: extract and verify user ID from Authorization header */
+async function getUserIdFromRequest(request: Request): Promise<string | null> {
+  const authHeader = request.headers.get('Authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) return null;
+
+  const token = authHeader.slice(7); // Remove 'Bearer '
+  if (!token) return null;
+
+  try {
+    const admin = createAdminClient();
+    const { data: { user } } = await admin.auth.getUser(token);
+    return user?.id || null;
+  } catch {
+    return null;
+  }
+}
 
 /**
- * HEAD handler — check if a PIN has been configured (without auth).
+ * HEAD handler — check if a PIN has been configured (no auth required).
  */
 export async function HEAD() {
   try {
@@ -12,8 +28,8 @@ export async function HEAD() {
       return NextResponse.json({ available: true }, { status: 200 });
     }
 
-    const supabase = createAdminClient();
-    const { data } = await supabase
+    const admin = createAdminClient();
+    const { data } = await admin
       .from('household_settings')
       .select('pin_hash')
       .not('pin_hash', 'is', null)
@@ -25,34 +41,18 @@ export async function HEAD() {
     }
 
     return NextResponse.json({ available: false }, { status: 404 });
-  } catch (err) {
-    console.error('HEAD /auth/pin/setup error:', err);
+  } catch {
     return NextResponse.json({ available: false }, { status: 404 });
   }
 }
 
 /**
- * GET handler — check if PIN is configured and return status.
- * Requires authentication.
+ * GET handler — check PIN configuration status.
+ * Requires Authorization: Bearer <token> header.
  */
 export async function GET(request: Request) {
   try {
-    // Authenticate — try Authorization header first, fall back to cookies
-    const authHeader = request.headers.get('Authorization');
-    let userId: string | null = null;
-
-    if (authHeader) {
-      const admin = createAdminClient();
-      const { data: { user } } = await admin.auth.getUser(authHeader.replace('Bearer ', ''));
-      userId = user?.id || null;
-    }
-
-    if (!userId) {
-      const supabase = await createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      userId = user?.id || null;
-    }
-
+    const userId = await getUserIdFromRequest(request);
     if (!userId) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
@@ -78,31 +78,13 @@ export async function GET(request: Request) {
 
 /**
  * DELETE handler — remove the household PIN.
- * Requires authentication.
+ * Requires Authorization: Bearer <token> header.
  */
 export async function DELETE(request: Request) {
   try {
-    // Authenticate — try Authorization header first, fall back to cookies
-    const authHeader = request.headers.get('Authorization');
-    let userId: string | null = null;
-
-    if (authHeader) {
-      const admin = createAdminClient();
-      const { data: { user } } = await admin.auth.getUser(authHeader.replace('Bearer ', ''));
-      userId = user?.id || null;
-    }
-
+    const userId = await getUserIdFromRequest(request);
     if (!userId) {
-      const supabase = await createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      userId = user?.id || null;
-    }
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Not authenticated. Please sign in again.' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
     const admin = createAdminClient();
@@ -131,10 +113,15 @@ export async function DELETE(request: Request) {
 
 /**
  * POST handler — set or update the household PIN.
- * Requires authentication. The authenticated user becomes the household user.
+ * Requires Authorization: Bearer <token> header.
  */
 export async function POST(request: Request) {
   try {
+    const userId = await getUserIdFromRequest(request);
+    if (!userId) {
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { pin, displayName } = body;
 
@@ -151,31 +138,6 @@ export async function POST(request: Request) {
 
     if (!/^\d+$/.test(pin)) {
       return NextResponse.json({ error: 'PIN must contain only digits' }, { status: 400 });
-    }
-
-    // Authenticate — try Authorization header first, fall back to cookies
-    const authHeader = request.headers.get('Authorization');
-    let userId: string | null = null;
-
-    if (authHeader) {
-      // Verify token from Authorization header using admin client
-      const admin = createAdminClient();
-      const { data: { user } } = await admin.auth.getUser(authHeader.replace('Bearer ', ''));
-      userId = user?.id || null;
-    }
-
-    if (!userId) {
-      // Fallback: try cookie-based auth
-      const supabase = await createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      userId = user?.id || null;
-    }
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Not authenticated. Please sign in again.' },
-        { status: 401 }
-      );
     }
 
     // Hash the PIN
