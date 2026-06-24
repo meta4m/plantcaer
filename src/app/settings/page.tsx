@@ -2,9 +2,10 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Lock, Sparkles, Loader2 } from 'lucide-react';
+import { Lock, Sparkles, Bell, Loader2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase';
 import { SettingsAiConfig } from '@/components/settings-ai-config';
+import { SettingsNotifications } from '@/components/settings-notifications';
 
 /** Hash a PIN using Web Crypto API (browser-compatible SHA-256) */
 async function hashPinClient(pin: string): Promise<string> {
@@ -18,6 +19,7 @@ async function hashPinClient(pin: string): Promise<string> {
 const TABS = [
   { id: 'pin', label: 'Family PIN', icon: Lock },
   { id: 'ai', label: 'AI Provider', icon: Sparkles },
+  { id: 'notifications', label: 'Notifications', icon: Bell },
 ];
 
 export default function SettingsPage() {
@@ -33,7 +35,7 @@ function SettingsPageContent() {
   const searchParams = useSearchParams();
   const supabase = createClient();
 
-  const initialTab = searchParams.get('tab') === 'ai' ? 'ai' : 'pin';
+  const initialTab = searchParams.get('tab') === 'notifications' ? 'notifications' : searchParams.get('tab') === 'ai' ? 'ai' : 'pin';
   const [activeTab, setActiveTab] = useState(initialTab);
 
   // PIN state
@@ -386,6 +388,12 @@ function SettingsPageContent() {
       {activeTab === 'ai' && (
         <div className="glass-card rounded-2xl p-6">
           <SettingsAiConfig />
+        </div>
+      )}
+
+      {activeTab === 'notifications' && (
+        <div className="glass-card rounded-2xl p-6">
+          <SettingsNotifications />
         </div>
       )}
     </div>
