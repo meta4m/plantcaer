@@ -4,7 +4,12 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Lock, Loader2, Eye, EyeOff } from 'lucide-react';
 
-export default function PinEntry() {
+interface PinEntryProps {
+  /** Where to redirect after successful PIN auth */
+  redirectTo?: string;
+}
+
+export default function PinEntry({ redirectTo }: PinEntryProps) {
   const router = useRouter();
   const [pin, setPin] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +34,7 @@ export default function PinEntry() {
       const data = await res.json();
 
       if (data.success) {
-        router.push('/');
+        router.push(redirectTo || '/');
         router.refresh();
       } else {
         setAttempts((a) => a + 1);

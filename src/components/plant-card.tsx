@@ -22,7 +22,10 @@ export function PlantCard({ plant, primaryPhotoUrl }: PlantCardProps) {
           <h3 className="text-lg font-semibold text-white group-hover:text-emerald-300 transition-colors truncate">
             {plant.nickname || plant.common_name}
           </h3>
-          {plant.scientific_name && (
+          {plant.nickname && plant.common_name && (
+            <p className="text-sm text-white/40 truncate mt-0.5">{plant.common_name}</p>
+          )}
+          {!plant.nickname && plant.scientific_name && (
             <p className="text-sm text-white/40 italic mt-0.5 truncate">{plant.scientific_name}</p>
           )}
         </div>

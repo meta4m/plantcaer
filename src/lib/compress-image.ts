@@ -17,9 +17,9 @@ interface CompressOptions {
 }
 
 const DEFAULTS: Required<CompressOptions> = {
-  maxDimension: 1920,
-  quality: 0.8,
-  format: 'image/jpeg',
+  maxDimension: 1200,
+  quality: 0.7,
+  format: 'image/webp',
 };
 
 /**
@@ -35,8 +35,8 @@ export async function compressImage(
   // If it's not an image, return as-is
   if (!file.type.startsWith('image/')) return file;
 
-  // Small files — skip compression
-  if (file.size < 100 * 1024) return file;
+  // Small files — skip compression (threshold lowered to 50KB)
+  if (file.size < 50 * 1024) return file;
 
   // HEIC/HEIF may not decode in Canvas on all browsers — skip
   if (file.type === 'image/heic' || file.type === 'image/heif') return file;

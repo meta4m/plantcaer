@@ -91,8 +91,10 @@ export async function middleware(request: NextRequest) {
 
   // Protected routes — require either PIN or Supabase session
   if (!isAuthenticated) {
-    // Redirect to login page (which shows both PIN and email options)
-    return NextResponse.redirect(new URL('/auth/login', request.url));
+    // Redirect to login page with redirect_to for post-auth navigation
+    const loginUrl = new URL('/auth/login', request.url);
+    loginUrl.searchParams.set('redirect_to', pathname + request.nextUrl.search);
+    return NextResponse.redirect(loginUrl);
   }
 
   return response;

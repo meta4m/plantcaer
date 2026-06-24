@@ -6,9 +6,10 @@ import { useState } from 'react';
 
 interface AuthFormProps {
   mode: 'login' | 'signup';
+  redirectTo?: string;
 }
 
-export function AuthForm({ mode }: AuthFormProps) {
+export function AuthForm({ mode, redirectTo }: AuthFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +36,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         if (timedOut) return; // timeout already handled
         clearTimeout(timeoutId);
         if (error) throw error;
-        router.push('/');
+        router.push(redirectTo || '/');
         router.refresh();
       } else {
         const { error } = await supabase.auth.signUp({ email, password });

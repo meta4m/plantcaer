@@ -108,25 +108,38 @@ export function PlantDetailContent({
               <h1 className="text-3xl font-bold text-white">
                 {plant.nickname || plant.common_name}
               </h1>
+              {plant.nickname && plant.common_name && (
+                <p className="text-base text-white/40 mt-0.5">{plant.common_name}</p>
+              )}
               {plant.scientific_name && (
-                <p className="text-lg text-white/40 italic mt-1">
+                <p className="text-lg text-white/30 italic mt-0.5">
                   {plant.scientific_name}
                 </p>
               )}
-              {plant.common_name && plant.nickname && (
-                <p className="text-sm text-white/30 mt-0.5">{plant.common_name}</p>
-              )}
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <CopyAsPrompt plant={plant} careTasks={careTasks} />
+          {/* Mobile: actions in top-right as compact icons */}
+          <div className="flex items-center gap-1.5">
+            <div className="sm:hidden">
+              <CopyAsPrompt plant={plant} careTasks={careTasks} compact />
+            </div>
+            <div className="hidden sm:block">
+              <CopyAsPrompt plant={plant} careTasks={careTasks} />
+            </div>
             {isOwner && (
               <>
                 <Link
                   href={`/plant/${plant.slug}/edit`}
-                  className="glass-card rounded-xl px-4 py-2 text-sm text-white/60 hover:text-white hover:bg-white/10 transition-all"
+                  className="hidden sm:inline-flex glass-card rounded-xl px-4 py-2 text-sm text-white/60 hover:text-white hover:bg-white/10 transition-all"
                 >
                   Edit
+                </Link>
+                <Link
+                  href={`/plant/${plant.slug}/edit`}
+                  className="sm:hidden rounded-xl p-2 text-white/40 hover:text-white hover:bg-white/10 transition-all"
+                  title="Edit plant"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
                 </Link>
               </>
             )}

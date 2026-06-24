@@ -10,6 +10,13 @@ export default function LoginPage() {
 
   // Check if PIN is available
   const [pinAvailable, setPinAvailable] = useState(false);
+  // Get redirect_to from URL
+  const redirectTo = typeof window !== 'undefined'
+    ? (() => {
+        const raw = new URLSearchParams(window.location.search).get('redirect_to');
+        return raw && raw.startsWith('/') ? raw : '/';
+      })()
+    : '/';
 
   useEffect(() => {
     fetch('/auth/pin/setup', { method: 'HEAD' })
@@ -28,7 +35,7 @@ export default function LoginPage() {
             <ChevronLeft className="h-4 w-4" />
             Back
           </button>
-          <PinEntry />
+          <PinEntry redirectTo={redirectTo} />
         </div>
       </div>
     );
@@ -50,7 +57,7 @@ export default function LoginPage() {
               <h1 className="text-2xl font-bold text-white">Welcome back</h1>
               <p className="mt-2 text-sm text-white/70">Sign in to your plant journal</p>
             </div>
-            <AuthForm mode="login" />
+            <AuthForm mode="login" redirectTo={redirectTo} />
           </div>
         </div>
       </div>

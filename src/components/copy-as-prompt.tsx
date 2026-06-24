@@ -8,9 +8,11 @@ import type { Plant, CareTask } from '@/lib/types';
 interface CopyAsPromptProps {
   plant: Plant;
   careTasks: CareTask[];
+  /** Compact icon-only mode for mobile */
+  compact?: boolean;
 }
 
-export function CopyAsPrompt({ plant, careTasks }: CopyAsPromptProps) {
+export function CopyAsPrompt({ plant, careTasks, compact = false }: CopyAsPromptProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -49,6 +51,23 @@ export function CopyAsPrompt({ plant, careTasks }: CopyAsPromptProps) {
       setTimeout(() => setCopied(false), 2500);
     }
   };
+
+  if (compact) {
+    return (
+      <button
+        type="button"
+        onClick={handleCopy}
+        className="rounded-xl p-2 text-white/40 hover:text-white hover:bg-white/10 transition-all active:scale-[0.98]"
+        title="Copy as AI prompt"
+      >
+        {copied ? (
+          <ClipboardCheck className="h-4 w-4 text-emerald-400" />
+        ) : (
+          <Clipboard className="h-4 w-4" />
+        )}
+      </button>
+    );
+  }
 
   return (
     <button

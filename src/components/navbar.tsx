@@ -89,6 +89,13 @@ export function Navbar() {
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
                     <div className="absolute right-0 top-full mt-2 z-50 w-48 glass-card rounded-xl py-1 shadow-xl">
+                      <Link
+                        href="/settings"
+                        onClick={() => setMenuOpen(false)}
+                        className="block w-full px-4 py-2 text-left text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+                      >
+                        Settings
+                      </Link>
                       <button
                         onClick={handleSignOut}
                         className="w-full px-4 py-2 text-left text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors"
