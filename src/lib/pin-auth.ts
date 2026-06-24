@@ -2,6 +2,7 @@
 
 import { cookies } from 'next/headers';
 import { createHash, randomBytes } from 'crypto';
+import { createAdminClient } from './supabase-admin';
 
 const COOKIE_NAME = 'plantcaer_pin';
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
@@ -13,14 +14,13 @@ export async function isPinMode(): Promise<boolean> {
   if (!!process.env.APP_PIN) return true;
   // Check DB for stored PIN hash
   try {
-    const { createClient } = await import('./supabase-server');
-    const supabase = await createClient();
-    const { data } = await supabase
+    const admin = createAdminClient();
+    const { data } = await admin
       .from('household_settings')
       .select('pin_hash')
       .not('pin_hash', 'is', null)
       .limit(1)
-      .single();
+      .maybeSingle();
     return !!data?.pin_hash;
   } catch {
     return false;
@@ -38,14 +38,13 @@ export async function validatePin(pin: string): Promise<boolean> {
 
   // Check DB-stored hash
   try {
-    const { createClient } = await import('./supabase-server');
-    const supabase = await createClient();
-    const { data } = await supabase
+    const admin = createAdminClient();
+    const { data } = await admin
       .from('household_settings')
       .select('pin_hash, pin_salt')
       .not('pin_hash', 'is', null)
       .limit(1)
-      .single();
+      .maybeSingle();
 
     if (!data?.pin_hash) return false;
 
@@ -71,14 +70,13 @@ export async function getHouseholdUserId(): Promise<string | null> {
 
   // Check DB
   try {
-    const { createClient } = await import('./supabase-server');
-    const supabase = await createClient();
-    const { data } = await supabase
+    const admin = createAdminClient();
+    const { data } = await admin
       .from('household_settings')
       .select('household_user_id')
       .not('household_user_id', 'is', null)
       .limit(1)
-      .single();
+      .maybeSingle();
 
     if (data?.household_user_id) {
       return data.household_user_id;

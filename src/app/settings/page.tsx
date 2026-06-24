@@ -5,13 +5,24 @@ import { useRouter } from 'next/navigation';
 import { Lock, Loader2, CheckCircle2, AlertCircle, Trash2, Eye, EyeOff } from 'lucide-react';
 import { createClient } from '@/lib/supabase';
 
+/** Hash a PIN using Web Crypto API (browser-compatible SHA-256) */
+async function hashPinClient(pin: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(pin);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 export default function SettingsPage() {
   const router = useRouter();
   const supabase = createClient();
 
+  const [userId, setUserId] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [pinConfigured, setPinConfigured] = useState(false);
   const [isHouseholdUser, setIsHouseholdUser] = useState(false);
+  const [settingsRowId, setSettingsRowId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   // PIN setup form
@@ -33,18 +44,23 @@ export default function SettingsPage() {
         router.push('/auth/login');
         return;
       }
+      setUserId(user.id);
       setUserEmail(user.email || null);
 
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        const headers: Record<string, string> = {};
-        if (session?.access_token) {
-          headers['Authorization'] = `Bearer ${session.access_token}`;
+        const { data: settings } = await supabase
+          .from('household_settings')
+          .select('id, pin_hash, household_user_id')
+          .maybeSingle();
+
+        if (settings) {
+          setSettingsRowId(settings.id);
+          setPinConfigured(!!settings.pin_hash);
+          setIsHouseholdUser(settings.household_user_id === user.id);
+        } else {
+          setPinConfigured(false);
+          setIsHouseholdUser(false);
         }
-        const res = await fetch('/auth/pin/setup', { headers });
-        const data = await res.json();
-        setPinConfigured(data.configured);
-        setIsHouseholdUser(data.isHouseholdUser);
       } catch {
         setPinConfigured(false);
       } finally {
@@ -77,32 +93,49 @@ export default function SettingsPage() {
 
     setSaving(true);
     try {
-      // Get access token from Supabase client session
-      const { data: { session } } = await supabase.auth.getSession();
-      const accessToken = session?.access_token;
+      const hash = await hashPinClient(newPin);
 
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (accessToken) {
-        headers['Authorization'] = `Bearer ${accessToken}`;
-      }
+      if (settingsRowId) {
+        // Update existing row
+        const { error } = await supabase
+          .from('household_settings')
+          .update({
+            pin_hash: hash,
+            pin_salt: '',
+            household_user_id: userId,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', settingsRowId);
 
-      const res = await fetch('/auth/pin/setup', {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ pin: newPin }),
-      });
+        if (error) {
+          setSaveError(error.message);
+          return;
+        }
+      } else {
+        // Insert new row
+        const { error } = await supabase
+          .from('household_settings')
+          .insert({
+            pin_hash: hash,
+            pin_salt: '',
+            household_user_id: userId,
+            display_name: 'My Household',
+          });
 
-      let errorMsg = 'Failed to set PIN';
-      try {
-        const data = await res.json();
-        errorMsg = data.error || errorMsg;
-      } catch {
-        errorMsg = 'Server error (invalid response)';
-      }
+        if (error) {
+          setSaveError(error.message);
+          return;
+        }
 
-      if (!res.ok) {
-        setSaveError(errorMsg);
-        return;
+        // Get the new row ID
+        const { data: newSettings } = await supabase
+          .from('household_settings')
+          .select('id')
+          .maybeSingle();
+
+        if (newSettings) {
+          setSettingsRowId(newSettings.id);
+        }
       }
 
       setSaveSuccess(true);
@@ -110,10 +143,9 @@ export default function SettingsPage() {
       setIsHouseholdUser(true);
       setNewPin('');
       setConfirmPin('');
-
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (err) {
-      setSaveError(err instanceof Error ? err.message : 'Network error. Please try again.');
+      setSaveError(err instanceof Error ? err.message : 'Failed to set PIN');
     } finally {
       setSaving(false);
     }
@@ -122,29 +154,20 @@ export default function SettingsPage() {
   const handleDeletePin = async () => {
     setDeleting(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const accessToken = session?.access_token;
+      if (settingsRowId) {
+        const { error } = await supabase
+          .from('household_settings')
+          .update({
+            pin_hash: null,
+            pin_salt: null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', settingsRowId);
 
-      const headers: Record<string, string> = {};
-      if (accessToken) {
-        headers['Authorization'] = `Bearer ${accessToken}`;
-      }
-
-      const res = await fetch('/auth/pin/setup', {
-        method: 'DELETE',
-        headers,
-      });
-
-      if (!res.ok) {
-        let errorMsg = 'Failed to remove PIN';
-        try {
-          const data = await res.json();
-          errorMsg = data.error || errorMsg;
-        } catch {
-          errorMsg = 'Server error (invalid response)';
+        if (error) {
+          setSaveError(error.message);
+          return;
         }
-        setSaveError(errorMsg);
-        return;
       }
 
       setPinConfigured(false);
@@ -152,7 +175,7 @@ export default function SettingsPage() {
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (err) {
-      setSaveError(err instanceof Error ? err.message : 'Network error. Please try again.');
+      setSaveError(err instanceof Error ? err.message : 'Failed to remove PIN');
     } finally {
       setDeleting(false);
     }
@@ -295,7 +318,6 @@ export default function SettingsPage() {
           </div>
         </form>
 
-        {/* Delete confirmation */}
         {showDeleteConfirm && (
           <div className="mt-4 rounded-xl bg-red-500/10 border border-red-500/20 p-4">
             <p className="text-sm text-red-300 mb-3">
