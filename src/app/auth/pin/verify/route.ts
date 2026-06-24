@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     const cookieSet = await setPinCookie();
     if (!cookieSet) {
       return NextResponse.json(
-        { success: false, error: 'PIN mode is not active' },
+        { success: false, error: 'No PIN is configured' },
         { status: 400 }
       );
     }

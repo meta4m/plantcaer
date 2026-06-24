@@ -21,17 +21,13 @@ export function Navbar() {
   }, [supabase]);
 
   const handleSignOut = async () => {
-    // Check if PIN mode is active
-    const isPinMode = document.cookie.includes('plantcaer_pin');
+    // Clear both PIN cookie and Supabase session
+    const hasPinCookie = document.cookie.includes('plantcaer_pin');
 
-    if (isPinMode) {
+    if (hasPinCookie) {
       await fetch('/auth/pin/verify', {
         method: 'DELETE',
       });
-      setUser(null);
-      router.push('/auth/pin');
-      router.refresh();
-      return;
     }
 
     await supabase.auth.signOut();
