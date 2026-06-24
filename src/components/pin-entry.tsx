@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Lock, Loader2, Eye, EyeOff } from 'lucide-react';
+import { createClient } from '@/lib/supabase';
 
 interface PinEntryProps {
   /** Where to redirect after successful PIN auth */
@@ -11,6 +12,7 @@ interface PinEntryProps {
 
 export default function PinEntry({ redirectTo }: PinEntryProps) {
   const router = useRouter();
+  const supabase = createClient();
   const [pin, setPin] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -34,6 +36,14 @@ export default function PinEntry({ redirectTo }: PinEntryProps) {
       const data = await res.json();
 
       if (data.success) {
+        // If server returned session tokens, set them on the client-side Supabase client
+        if (data.session?.access_token && data.session?.refresh_token) {
+          await supabase.auth.setSession({
+            access_token: data.session.access_token,
+            refresh_token: data.session.refresh_token,
+          });
+        }
+
         router.push(redirectTo || '/');
         router.refresh();
       } else {
@@ -54,10 +64,8 @@ export default function PinEntry({ redirectTo }: PinEntryProps) {
   };
 
   const handleDigitClick = (digit: string) => {
-    if (pin.length < 6) {
-      setPin((p) => p + digit);
-      setError(null);
-    }
+    setPin((p) => p + digit);
+    setError(null);
   };
 
   const handleBackspace = () => {
@@ -84,9 +92,9 @@ export default function PinEntry({ redirectTo }: PinEntryProps) {
           </div>
         )}
 
-        {/* PIN dots */}
+        {/* PIN dots — dynamic based on pin length */}
         <div className="flex justify-center gap-3">
-          {[0, 1, 2, 3, 4, 5].map((i) => (
+          {Array.from({ length: pin.length || 4 }).map((_, i) => (
             <div
               key={i}
               className={`h-3.5 w-3.5 rounded-full transition-all duration-150 ${
@@ -104,12 +112,11 @@ export default function PinEntry({ redirectTo }: PinEntryProps) {
             type={showPin ? 'text' : 'password'}
             value={pin}
             onChange={(e) => {
-              setPin(e.target.value.replace(/[^0-9]/g, '').slice(0, 6));
+              setPin(e.target.value.replace(/[^0-9]/g, ''));
               setError(null);
             }}
             className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-center text-lg tracking-[0.5em] text-white focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
-            placeholder="••••••"
-            maxLength={6}
+            placeholder="Enter PIN"
             autoFocus
             inputMode="numeric"
             pattern="[0-9]*"
@@ -130,8 +137,7 @@ export default function PinEntry({ redirectTo }: PinEntryProps) {
               key={d}
               type="button"
               onClick={() => handleDigitClick(String(d))}
-              disabled={pin.length >= 6}
-              className="h-14 rounded-xl bg-white/5 text-lg font-medium text-white hover:bg-white/10 active:bg-white/15 active:scale-95 transition-all disabled:opacity-30"
+              className="h-14 rounded-xl bg-white/5 text-lg font-medium text-white hover:bg-white/10 active:bg-white/15 active:scale-95 transition-all"
             >
               {d}
             </button>
@@ -140,7 +146,6 @@ export default function PinEntry({ redirectTo }: PinEntryProps) {
           <button
             type="button"
             onClick={() => handleDigitClick('0')}
-            disabled={pin.length >= 6}
             className="h-14 rounded-xl bg-white/5 text-lg font-medium text-white hover:bg-white/10 active:bg-white/15 active:scale-95 transition-all disabled:opacity-30"
           >
             0
@@ -156,7 +161,7 @@ export default function PinEntry({ redirectTo }: PinEntryProps) {
 
         <button
           type="submit"
-          disabled={pin.length < 4 || loading}
+          disabled={!pin || loading}
           className="w-full rounded-xl bg-emerald-500 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
         >
           {loading ? (
