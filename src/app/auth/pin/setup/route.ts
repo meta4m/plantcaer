@@ -35,11 +35,25 @@ export async function HEAD() {
  * GET handler — check if PIN is configured and return status.
  * Requires authentication.
  */
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
+    // Authenticate — try Authorization header first, fall back to cookies
+    const authHeader = request.headers.get('Authorization');
+    let userId: string | null = null;
+
+    if (authHeader) {
+      const admin = createAdminClient();
+      const { data: { user } } = await admin.auth.getUser(authHeader.replace('Bearer ', ''));
+      userId = user?.id || null;
+    }
+
+    if (!userId) {
+      const supabase = await createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      userId = user?.id || null;
+    }
+
+    if (!userId) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
@@ -54,7 +68,7 @@ export async function GET() {
     return NextResponse.json({
       configured,
       displayName: data?.display_name || 'My Household',
-      isHouseholdUser: data?.household_user_id === user.id,
+      isHouseholdUser: data?.household_user_id === userId,
     });
   } catch (err) {
     console.error('GET /auth/pin/setup error:', err);
@@ -66,12 +80,29 @@ export async function GET() {
  * DELETE handler — remove the household PIN.
  * Requires authentication.
  */
-export async function DELETE() {
+export async function DELETE(request: Request) {
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    // Authenticate — try Authorization header first, fall back to cookies
+    const authHeader = request.headers.get('Authorization');
+    let userId: string | null = null;
+
+    if (authHeader) {
+      const admin = createAdminClient();
+      const { data: { user } } = await admin.auth.getUser(authHeader.replace('Bearer ', ''));
+      userId = user?.id || null;
+    }
+
+    if (!userId) {
+      const supabase = await createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      userId = user?.id || null;
+    }
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Not authenticated. Please sign in again.' },
+        { status: 401 }
+      );
     }
 
     const admin = createAdminClient();
@@ -122,13 +153,27 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'PIN must contain only digits' }, { status: 400 });
     }
 
-    // Authenticate using the anon-key client (reads session cookies)
-    const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      console.error('Auth error in POST /auth/pin/setup:', authError);
+    // Authenticate — try Authorization header first, fall back to cookies
+    const authHeader = request.headers.get('Authorization');
+    let userId: string | null = null;
+
+    if (authHeader) {
+      // Verify token from Authorization header using admin client
+      const admin = createAdminClient();
+      const { data: { user } } = await admin.auth.getUser(authHeader.replace('Bearer ', ''));
+      userId = user?.id || null;
+    }
+
+    if (!userId) {
+      // Fallback: try cookie-based auth
+      const supabase = await createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      userId = user?.id || null;
+    }
+
+    if (!userId) {
       return NextResponse.json(
-        { error: authError?.message || 'Not authenticated' },
+        { error: 'Not authenticated. Please sign in again.' },
         { status: 401 }
       );
     }
@@ -151,7 +196,7 @@ export async function POST(request: Request) {
         .update({
           pin_hash: hash,
           pin_salt: salt,
-          household_user_id: user.id,
+          household_user_id: userId,
           display_name: displayName || 'My Household',
           updated_at: new Date().toISOString(),
         })
@@ -167,7 +212,7 @@ export async function POST(request: Request) {
         .insert({
           pin_hash: hash,
           pin_salt: salt,
-          household_user_id: user.id,
+          household_user_id: userId,
           display_name: displayName || 'My Household',
         });
 

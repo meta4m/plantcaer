@@ -36,7 +36,12 @@ export default function SettingsPage() {
       setUserEmail(user.email || null);
 
       try {
-        const res = await fetch('/auth/pin/setup');
+        const { data: { session } } = await supabase.auth.getSession();
+        const headers: Record<string, string> = {};
+        if (session?.access_token) {
+          headers['Authorization'] = `Bearer ${session.access_token}`;
+        }
+        const res = await fetch('/auth/pin/setup', { headers });
         const data = await res.json();
         setPinConfigured(data.configured);
         setIsHouseholdUser(data.isHouseholdUser);
@@ -72,9 +77,18 @@ export default function SettingsPage() {
 
     setSaving(true);
     try {
+      // Get access token from Supabase client session
+      const { data: { session } } = await supabase.auth.getSession();
+      const accessToken = session?.access_token;
+
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (accessToken) {
+        headers['Authorization'] = `Bearer ${accessToken}`;
+      }
+
       const res = await fetch('/auth/pin/setup', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ pin: newPin }),
       });
 
@@ -101,8 +115,17 @@ export default function SettingsPage() {
   const handleDeletePin = async () => {
     setDeleting(true);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const accessToken = session?.access_token;
+
+      const headers: Record<string, string> = {};
+      if (accessToken) {
+        headers['Authorization'] = `Bearer ${accessToken}`;
+      }
+
       const res = await fetch('/auth/pin/setup', {
         method: 'DELETE',
+        headers,
       });
 
       if (!res.ok) {
