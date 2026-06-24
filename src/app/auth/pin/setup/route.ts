@@ -1,20 +1,18 @@
 import { NextResponse } from 'next/server';
 import { hashPin } from '@/lib/pin-auth';
+import { createAdminClient } from '@/lib/supabase-admin';
+import { createClient } from '@/lib/supabase-server';
 
 /**
  * HEAD handler — check if a PIN has been configured (without auth).
- * Used by the login/signup pages to decide whether to show the PIN option.
  */
 export async function HEAD() {
   try {
-    // Check APP_PIN env var first
     if (process.env.APP_PIN) {
       return NextResponse.json({ available: true }, { status: 200 });
     }
 
-    // Check DB for stored PIN hash
-    const { createClient } = await import('@/lib/supabase-server');
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     const { data } = await supabase
       .from('household_settings')
       .select('pin_hash')
@@ -27,27 +25,26 @@ export async function HEAD() {
     }
 
     return NextResponse.json({ available: false }, { status: 404 });
-  } catch {
+  } catch (err) {
+    console.error('HEAD /auth/pin/setup error:', err);
     return NextResponse.json({ available: false }, { status: 404 });
   }
 }
 
 /**
  * GET handler — check if PIN is configured and return status.
- * Requires authentication (returns current user's PIN setup status).
+ * Requires authentication.
  */
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    const { createClient } = await import('@/lib/supabase-server');
     const supabase = await createClient();
-
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
-    // Check if PIN is configured (include pin_hash for the check)
-    const { data } = await supabase
+    const admin = createAdminClient();
+    const { data } = await admin
       .from('household_settings')
       .select('id, pin_hash, display_name, household_user_id')
       .maybeSingle();
@@ -59,37 +56,32 @@ export async function GET(request: Request) {
       displayName: data?.display_name || 'My Household',
       isHouseholdUser: data?.household_user_id === user.id,
     });
-  } catch {
+  } catch (err) {
+    console.error('GET /auth/pin/setup error:', err);
     return NextResponse.json({ configured: false }, { status: 200 });
   }
 }
 
 /**
- * POST handler — set or update the household PIN.
- * Requires authentication. The authenticated user becomes the household user.
- */
-/**
- * DELETE handler — remove the household PIN and clear its DB entries.
- * Requires authentication. The authenticated user must be the household user.
+ * DELETE handler — remove the household PIN.
+ * Requires authentication.
  */
 export async function DELETE() {
   try {
-    const { createClient } = await import('@/lib/supabase-server');
     const supabase = await createClient();
-
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
-    // Clear pin_hash and pin_salt (keep the row for other settings)
-    const { data: existing } = await supabase
+    const admin = createAdminClient();
+    const { data: existing } = await admin
       .from('household_settings')
       .select('id')
       .maybeSingle();
 
     if (existing) {
-      await supabase
+      await admin
         .from('household_settings')
         .update({
           pin_hash: null,
@@ -101,59 +93,60 @@ export async function DELETE() {
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error('Failed to remove PIN:', err);
-    return NextResponse.json(
-      { error: 'Failed to remove PIN' },
-      { status: 500 }
-    );
+    console.error('DELETE /auth/pin/setup error:', err);
+    return NextResponse.json({ error: 'Failed to remove PIN' }, { status: 500 });
   }
 }
 
+/**
+ * POST handler — set or update the household PIN.
+ * Requires authentication. The authenticated user becomes the household user.
+ */
 export async function POST(request: Request) {
   try {
-    const { pin, displayName } = await request.json();
+    const body = await request.json();
+    const { pin, displayName } = body;
 
     if (!pin || typeof pin !== 'string') {
-      return NextResponse.json(
-        { error: 'PIN is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'PIN is required' }, { status: 400 });
     }
 
     if (pin.length < 4 || pin.length > 10) {
       return NextResponse.json(
-        { error: 'PIN must be between 4 and 10 characters' },
+        { error: 'PIN must be between 4 and 10 digits' },
         { status: 400 }
       );
     }
 
     if (!/^\d+$/.test(pin)) {
-      return NextResponse.json(
-        { error: 'PIN must contain only digits' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'PIN must contain only digits' }, { status: 400 });
     }
 
-    const { createClient } = await import('@/lib/supabase-server');
+    // Authenticate using the anon-key client (reads session cookies)
     const supabase = await createClient();
-
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      console.error('Auth error in POST /auth/pin/setup:', authError);
+      return NextResponse.json(
+        { error: authError?.message || 'Not authenticated' },
+        { status: 401 }
+      );
     }
 
     // Hash the PIN
     const { hash, salt } = await hashPin(pin);
 
+    // Use admin client for DB operations (bypasses RLS)
+    const admin = createAdminClient();
+
     // Check if settings row already exists
-    const { data: existing } = await supabase
+    const { data: existing } = await admin
       .from('household_settings')
       .select('id')
       .maybeSingle();
 
     if (existing) {
-      // Update existing row
-      await supabase
+      const { error: updateError } = await admin
         .from('household_settings')
         .update({
           pin_hash: hash,
@@ -163,9 +156,13 @@ export async function POST(request: Request) {
           updated_at: new Date().toISOString(),
         })
         .eq('id', existing.id);
+
+      if (updateError) {
+        console.error('Failed to update PIN in DB:', updateError);
+        return NextResponse.json({ error: 'Database error: ' + updateError.message }, { status: 500 });
+      }
     } else {
-      // Insert new row
-      await supabase
+      const { error: insertError } = await admin
         .from('household_settings')
         .insert({
           pin_hash: hash,
@@ -173,13 +170,18 @@ export async function POST(request: Request) {
           household_user_id: user.id,
           display_name: displayName || 'My Household',
         });
+
+      if (insertError) {
+        console.error('Failed to insert PIN in DB:', insertError);
+        return NextResponse.json({ error: 'Database error: ' + insertError.message }, { status: 500 });
+      }
     }
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error('Failed to set PIN:', err);
+    console.error('POST /auth/pin/setup error:', err);
     return NextResponse.json(
-      { error: 'Failed to set PIN' },
+      { error: err instanceof Error ? err.message : 'Failed to set PIN' },
       { status: 500 }
     );
   }
