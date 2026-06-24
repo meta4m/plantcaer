@@ -1,6 +1,6 @@
 'use client';
 
-import type { Plant, CareTask, CareLog, JournalEntry, PlantPhoto, TaskType } from '@/lib/types';
+import type { Plant, CareTask, CareLog, JournalEntry, PlantPhoto, GrowthRecord, TaskType } from '@/lib/types';
 import {
   TASK_TYPE_ICONS,
   TASK_TYPE_LABELS,
@@ -14,6 +14,7 @@ import { PhotoGallery } from './photo-gallery';
 import { getPhotoUrl } from '@/lib/storage';
 import { QRCode } from './qr-code';
 import { CopyAsPrompt } from './copy-as-prompt';
+import { GrowthTracking } from './growth-tracking';
 
 interface PlantDetailContentProps {
   plant: Plant;
@@ -21,6 +22,7 @@ interface PlantDetailContentProps {
   careLogs: CareLog[];
   journalEntries: (JournalEntry & { profiles?: { display_name: string | null; avatar_url: string | null } })[];
   photos: PlantPhoto[];
+  growthRecords: GrowthRecord[];
   isOwner: boolean;
 }
 
@@ -30,6 +32,7 @@ export function PlantDetailContent({
   careLogs,
   journalEntries,
   photos,
+  growthRecords,
   isOwner,
 }: PlantDetailContentProps) {
   const router = useRouter();
@@ -320,7 +323,7 @@ export function PlantDetailContent({
         </div>
 
         {/* Journal */}
-        <div>
+        <div id="journal">
           <h2 className="text-lg font-semibold text-white mb-4">Journal</h2>
 
           <div className="glass-card rounded-2xl p-4 mb-4">
@@ -367,6 +370,9 @@ export function PlantDetailContent({
           )}
         </div>
       </div>
+
+      {/* Growth Tracking */}
+      <GrowthTracking plantId={plant.id} records={growthRecords} />
     </div>
   );
 }

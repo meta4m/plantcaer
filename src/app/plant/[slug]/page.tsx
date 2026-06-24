@@ -51,6 +51,13 @@ export default async function PlantDetailPage({
     .eq('plant_id', plant.id)
     .order('uploaded_at', { ascending: false });
 
+  // Fetch growth records
+  const { data: growthRecords } = await db
+    .from('growth_records')
+    .select('*')
+    .eq('plant_id', plant.id)
+    .order('recorded_at', { ascending: false });
+
   const isOwner = plant.owner_id === user.id;
 
   return (
@@ -60,6 +67,7 @@ export default async function PlantDetailPage({
       careLogs={careLogs ?? []}
       journalEntries={journalEntries ?? []}
       photos={photos ?? []}
+      growthRecords={growthRecords ?? []}
       isOwner={isOwner}
     />
   );
