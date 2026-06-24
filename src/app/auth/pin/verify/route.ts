@@ -48,40 +48,38 @@ export async function POST(request: Request) {
             email,
           });
 
-          const actionLink = linkData?.properties?.action_link;
-          if (actionLink) {
-            const token = new URL(actionLink).searchParams.get('token');
+          // Use email_otp from the generateLink response (numeric OTP, not URL token)
+          const otp = linkData?.properties?.email_otp;
 
-            if (token) {
-              // Verify the OTP using the anon key + plain fetch
-              // This creates a session and returns tokens without needing cookies()
-              const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-              const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+          if (otp) {
+            // Verify the OTP using the anon key + plain fetch
+            // This creates a session and returns tokens without needing cookies()
+            const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+            const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-              const otpRes = await fetch(
-                `${supabaseUrl}/auth/v1/verify`,
-                {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    apikey: anonKey,
-                  },
-                  body: JSON.stringify({
-                    type: 'magiclink',
-                    token,
-                    email,
-                  }),
-                }
-              );
+            const otpRes = await fetch(
+              `${supabaseUrl}/auth/v1/verify`,
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  apikey: anonKey,
+                },
+                body: JSON.stringify({
+                  type: 'magiclink',
+                  token: otp,
+                  email,
+                }),
+              }
+            );
 
-              if (otpRes.ok) {
-                const otpData = await otpRes.json();
-                if (otpData.access_token && otpData.refresh_token) {
-                  session = {
-                    access_token: otpData.access_token,
-                    refresh_token: otpData.refresh_token,
-                  };
-                }
+            if (otpRes.ok) {
+              const otpData = await otpRes.json();
+              if (otpData.access_token && otpData.refresh_token) {
+                session = {
+                  access_token: otpData.access_token,
+                  refresh_token: otpData.refresh_token,
+                };
               }
             }
           }
