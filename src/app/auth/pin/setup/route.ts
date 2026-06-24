@@ -33,6 +33,7 @@ export async function HEAD() {
       .from('household_settings')
       .select('pin_hash')
       .not('pin_hash', 'is', null)
+      .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
 
@@ -61,6 +62,8 @@ export async function GET(request: Request) {
     const { data } = await admin
       .from('household_settings')
       .select('id, pin_hash, display_name, household_user_id')
+      .order('created_at', { ascending: false })
+      .limit(1)
       .maybeSingle();
 
     const configured = !!data?.pin_hash || !!process.env.APP_PIN;
@@ -91,6 +94,8 @@ export async function DELETE(request: Request) {
     const { data: existing } = await admin
       .from('household_settings')
       .select('id')
+      .order('created_at', { ascending: false })
+      .limit(1)
       .maybeSingle();
 
     if (existing) {
@@ -129,13 +134,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'PIN is required' }, { status: 400 });
     }
 
-    if (pin.length < 4 || pin.length > 10) {
-      return NextResponse.json(
-        { error: 'PIN must be between 4 and 10 digits' },
-        { status: 400 }
-      );
-    }
-
     if (!/^\d+$/.test(pin)) {
       return NextResponse.json({ error: 'PIN must contain only digits' }, { status: 400 });
     }
@@ -150,6 +148,8 @@ export async function POST(request: Request) {
     const { data: existing } = await admin
       .from('household_settings')
       .select('id')
+      .order('created_at', { ascending: false })
+      .limit(1)
       .maybeSingle();
 
     if (existing) {

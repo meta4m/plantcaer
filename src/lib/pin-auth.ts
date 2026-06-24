@@ -19,6 +19,7 @@ export async function isPinMode(): Promise<boolean> {
       .from('household_settings')
       .select('pin_hash')
       .not('pin_hash', 'is', null)
+      .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
     return !!data?.pin_hash;
@@ -43,6 +44,7 @@ export async function validatePin(pin: string): Promise<boolean> {
       .from('household_settings')
       .select('pin_hash, pin_salt')
       .not('pin_hash', 'is', null)
+      .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
 
@@ -75,6 +77,7 @@ export async function getHouseholdUserId(): Promise<string | null> {
       .from('household_settings')
       .select('household_user_id')
       .not('household_user_id', 'is', null)
+      .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
 
