@@ -10,10 +10,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Loader2, X, Check } from 'lucide-react';
 import type { TaskType } from '@/lib/types';
-import { TASK_TYPE_LABELS, TASK_TYPE_ICONS } from '@/lib/types';
-
-// Import FullCalendar styles
-import '@fullcalendar/daygrid/main.css';
+import { TASK_TYPE_LABELS, TASK_TYPE_ICONS } from '@/lib/types';// FullCalendar v6 injects styles automatically via JS — no CSS import needed
 
 export interface CalendarEvent {
   id: string;
