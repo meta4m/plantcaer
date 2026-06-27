@@ -19,14 +19,14 @@ export function PlantCard({ plant, primaryPhotoUrl }: PlantCardProps) {
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-semibold text-white group-hover:text-emerald-300 transition-colors truncate">
+          <h3 className="text-lg font-semibold text-stone-800 group-hover:text-emerald-600 transition-colors truncate">
             {plant.nickname || plant.common_name}
           </h3>
           {plant.nickname && plant.common_name && (
-            <p className="text-sm text-white/40 truncate mt-0.5">{plant.common_name}</p>
+            <p className="text-sm text-stone-400 truncate mt-0.5">{plant.common_name}</p>
           )}
           {!plant.nickname && plant.scientific_name && (
-            <p className="text-sm text-white/40 italic mt-0.5 truncate">{plant.scientific_name}</p>
+            <p className="text-sm text-stone-400 italic mt-0.5 truncate">{plant.scientific_name}</p>
           )}
         </div>
         {/* Primary photo thumbnail or placeholder */}
@@ -46,7 +46,7 @@ export function PlantCard({ plant, primaryPhotoUrl }: PlantCardProps) {
       </div>
 
       {plant.location && (
-        <p className="text-sm text-white/50 mb-3">
+        <p className="text-sm text-stone-500 mb-3">
           📍 {plant.location}
         </p>
       )}
@@ -56,14 +56,14 @@ export function PlantCard({ plant, primaryPhotoUrl }: PlantCardProps) {
           {tasksDue.slice(0, 4).map((task) => (
             <span
               key={task.id}
-              className="inline-flex items-center gap-1 rounded-full bg-white/5 px-2 py-0.5 text-xs text-white/50"
+              className="inline-flex items-center gap-1 rounded-full bg-amber-50/50 px-2 py-0.5 text-xs text-stone-500"
             >
               <span>{TASK_TYPE_ICONS[task.task_type as TaskType]}</span>
               <span>{TASK_TYPE_LABELS[task.task_type as TaskType]}</span>
             </span>
           ))}
           {tasksDue.length > 4 && (
-            <span className="text-xs text-white/30">+{tasksDue.length - 4} more</span>
+            <span className="text-xs text-stone-400">+{tasksDue.length - 4} more</span>
           )}
         </div>
       )}

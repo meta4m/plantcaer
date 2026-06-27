@@ -24,7 +24,7 @@ const TABS = [
 
 export default function SettingsPage() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center min-h-[50vh]"><Loader2 className="h-6 w-6 animate-spin text-white/40" /></div>}>
+    <Suspense fallback={<div className="flex items-center justify-center min-h-[50vh]"><Loader2 className="h-6 w-6 animate-spin text-stone-400" /></div>}>
       <SettingsPageContent />
     </Suspense>
   );
@@ -215,28 +215,28 @@ function SettingsPageContent() {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-white">Settings</h1>
-        <p className="mt-1 text-white/50">Manage your account and app configuration</p>
+        <h1 className="text-3xl font-bold text-stone-800">Settings</h1>
+        <p className="mt-1 text-stone-500">Manage your account and app configuration</p>
       </div>
 
       {/* Account info */}
       <div className="glass-card rounded-2xl p-6">
-        <h2 className="text-lg font-semibold text-white mb-4">Account</h2>
+        <h2 className="text-lg font-semibold text-stone-800 mb-4">Account</h2>
         {userEmail && (
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-300 font-medium">
+            <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-medium">
               {userEmail[0].toUpperCase()}
             </div>
             <div>
-              <p className="text-sm font-medium text-white">{userEmail}</p>
-              <p className="text-xs text-white/40">Signed in</p>
+              <p className="text-sm font-medium text-stone-800">{userEmail}</p>
+              <p className="text-xs text-stone-400">Signed in</p>
             </div>
           </div>
         )}
       </div>
 
       {/* Tab navigation */}
-      <div className="flex gap-1 rounded-xl bg-white/5 p-1">
+      <div className="flex gap-1 rounded-xl bg-stone-100/50 p-1">
         {TABS.map((tab) => {
           const Icon = tab.icon;
           return (
@@ -245,8 +245,8 @@ function SettingsPageContent() {
               onClick={() => switchTab(tab.id)}
               className={`flex-1 flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all ${
                 activeTab === tab.id
-                  ? 'bg-emerald-500/20 text-emerald-300 shadow-sm'
-                  : 'text-white/50 hover:text-white hover:bg-white/5'
+                  ? 'bg-emerald-100 text-emerald-700 shadow-sm'
+                  : 'text-stone-500 hover:text-stone-800 hover:bg-stone-100/50'
               }`}
             >
               <Icon className="h-4 w-4" />
@@ -260,12 +260,12 @@ function SettingsPageContent() {
       {activeTab === 'pin' && (
         <div className="glass-card rounded-2xl p-6">
           <div className="flex items-center gap-3 mb-6">
-            <div className="h-10 w-10 rounded-xl bg-emerald-500/15 flex items-center justify-center">
-              <Lock className="h-5 w-5 text-emerald-400" />
+            <div className="h-10 w-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+              <Lock className="h-5 w-5 text-emerald-600" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-white">Family PIN</h2>
-              <p className="text-xs text-white/40">
+              <h2 className="text-lg font-semibold text-stone-800">Family PIN</h2>
+              <p className="text-xs text-stone-400">
                 {pinConfigured
                   ? 'A household PIN is configured. Family members can use it to sign in.'
                   : 'Set a shared PIN so family members can access the app without creating accounts.'}
@@ -274,14 +274,14 @@ function SettingsPageContent() {
           </div>
 
           {pinSuccess && (
-            <div className="flex items-center gap-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-3 mb-4 text-sm text-emerald-300">
+            <div className="flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200/50 px-4 py-3 mb-4 text-sm text-emerald-700">
               <span>✓</span>
               {pinConfigured ? 'PIN updated successfully!' : 'PIN removed successfully!'}
             </div>
           )}
 
           {pinError && (
-            <div className="flex items-start gap-2 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 mb-4 text-sm text-red-400">
+            <div className="flex items-start gap-2 rounded-xl bg-red-50 border border-red-200/50 px-4 py-3 mb-4 text-sm text-red-600">
               <span className="mt-0.5 shrink-0">!</span>
               <p>{pinError}</p>
             </div>
@@ -290,7 +290,7 @@ function SettingsPageContent() {
           <form onSubmit={handleSetPin} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="new-pin" className="block text-sm font-medium text-white/70 mb-1.5">
+                <label htmlFor="new-pin" className="block text-sm font-medium text-stone-600 mb-1.5">
                   {pinConfigured ? 'New PIN' : 'Family PIN'}
                 </label>
                 <div className="relative">
@@ -302,12 +302,12 @@ function SettingsPageContent() {
                     placeholder="Enter PIN"
                     inputMode="numeric"
                     pattern="[0-9]*"
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 pr-10 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
+                    className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 pr-10 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPin(!showPin)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 transition-colors"
                   >
                     {showPin ? '🙈' : '👁️'}
                   </button>
@@ -325,7 +325,7 @@ function SettingsPageContent() {
                   placeholder="Repeat PIN"
                   inputMode="numeric"
                   pattern="[0-9]*"
-                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
+                  className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
                 />
               </div>
             </div>
@@ -334,7 +334,7 @@ function SettingsPageContent() {
               <button
                 type="submit"
                 disabled={savingPin || !newPin || !confirmPin}
-                className="rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
+                className="rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
               >
                 {savingPin ? (
                   <span className="flex items-center gap-2">
@@ -352,7 +352,7 @@ function SettingsPageContent() {
                 <button
                   type="button"
                   onClick={() => setShowDeleteConfirm(true)}
-                  className="rounded-xl border border-red-500/30 px-5 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-all"
+                  className="rounded-xl border border-red-300/50 px-5 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-all"
                 >
                   Remove PIN
                 </button>
@@ -361,8 +361,8 @@ function SettingsPageContent() {
           </form>
 
           {showDeleteConfirm && (
-            <div className="mt-4 rounded-xl bg-red-500/10 border border-red-500/20 p-4">
-              <p className="text-sm text-red-300 mb-3">
+            <div className="mt-4 rounded-xl bg-red-50 border border-red-200/50 p-4">
+              <p className="text-sm text-red-700 mb-3">
                 Are you sure? This will remove the family PIN.
               </p>
               <div className="flex gap-2">
@@ -375,7 +375,7 @@ function SettingsPageContent() {
                 </button>
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="rounded-lg border border-white/10 px-4 py-2 text-xs text-white/50 hover:text-white hover:bg-white/5 transition-all"
+                  className="rounded-lg border border-stone-200/50 px-4 py-2 text-xs text-stone-500 hover:text-stone-800 hover:bg-stone-100/50 transition-all"
                 >
                   Cancel
                 </button>

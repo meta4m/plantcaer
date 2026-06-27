@@ -59,12 +59,12 @@ export function CareView({
         <div>
           {view === 'calendar' && (
             <>
-              <h1 className="text-3xl font-bold text-white">
+              <h1 className="text-3xl font-bold text-stone-800">
                 {filteredPlant
                   ? `${filteredPlant.nickname || filteredPlant.common_name} — Care`
                   : 'Care Calendar'}
               </h1>
-              <p className="mt-1 text-white/50">
+              <p className="mt-1 text-stone-500">
                 {calendarEvents.length} event{calendarEvents.length !== 1 ? 's' : ''}
               </p>
             </>
@@ -75,7 +75,7 @@ export function CareView({
           {filteredPlant && (
             <Link
               href="/care"
-              className="glass-card rounded-xl px-4 py-2 text-sm text-white/60 hover:text-white hover:bg-white/10 transition-all"
+              className="glass-card rounded-xl px-4 py-2 text-sm text-stone-500 hover:text-stone-800 hover:bg-stone-100/80 transition-all"
             >
               All Plants
             </Link>
@@ -84,7 +84,7 @@ export function CareView({
           <a
             href={`/api/calendar/export${plantSlug ? `?plant=${plantSlug}` : ''}`}
             download
-            className="glass-card rounded-xl px-4 py-2 text-sm text-white/60 hover:text-white hover:bg-white/10 transition-all flex items-center gap-1.5"
+            className="glass-card rounded-xl px-4 py-2 text-sm text-stone-500 hover:text-stone-800 hover:bg-stone-100/80 transition-all flex items-center gap-1.5"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             Export
@@ -95,8 +95,8 @@ export function CareView({
               onClick={() => switchView('list')}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                 view === 'list'
-                  ? 'bg-emerald-500/20 text-emerald-300'
-                  : 'text-white/60 hover:text-white'
+                  ? 'bg-emerald-100 text-emerald-700'
+                  : 'text-stone-500 hover:text-stone-800'
               }`}
             >
               List
@@ -105,8 +105,8 @@ export function CareView({
               onClick={() => switchView('calendar')}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                 view === 'calendar'
-                  ? 'bg-emerald-500/20 text-emerald-300'
-                  : 'text-white/60 hover:text-white'
+                  ? 'bg-emerald-100 text-emerald-700'
+                  : 'text-stone-500 hover:text-stone-800'
               }`}
             >
               Calendar
@@ -131,8 +131,8 @@ export function CareView({
         ) : (
           <div className="text-center py-20">
             <span className="text-5xl mb-4 block">📅</span>
-            <h2 className="text-xl font-semibold text-white mb-2">No plants yet</h2>
-            <p className="text-white/40 mb-6">
+            <h2 className="text-xl font-semibold text-stone-700 mb-2">No plants yet</h2>
+            <p className="text-stone-400 mb-6">
               Add plants and configure care tasks to see them on the calendar.
             </p>
             <Link

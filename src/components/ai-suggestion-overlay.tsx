@@ -114,15 +114,15 @@ export function AiSuggestionOverlay({
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${
-              state === 'result' ? 'bg-emerald-500/15' : 'bg-white/5'
+              state === 'result' ? 'bg-emerald-100' : 'bg-stone-100/50'
             }`}>
               <Sparkles className={`h-5 w-5 ${
-                state === 'result' ? 'text-emerald-400' : 'text-white/40'
+                state === 'result' ? 'text-emerald-600' : 'text-stone-400'
               }`} />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-white">AI Plant Identification</h3>
-              <p className="text-xs text-white/40">
+              <h3 className="text-lg font-semibold text-stone-800">AI Plant Identification</h3>
+              <p className="text-xs text-stone-400">
                 {hasPhoto
                   ? 'Identifying plant from your photo...'
                   : 'Identifying plant from name...'}
@@ -131,7 +131,7 @@ export function AiSuggestionOverlay({
           </div>
           <button
             onClick={onDismiss}
-            className="rounded-full bg-white/10 p-1.5 text-white/60 hover:text-white hover:bg-white/20 transition-all"
+            className="rounded-full bg-stone-100/50 p-1.5 text-stone-500 hover:text-stone-800 hover:bg-stone-200/50 transition-all"
           >
             <X className="h-4 w-4" />
           </button>
@@ -139,18 +139,18 @@ export function AiSuggestionOverlay({
 
         {state === 'idle' && (
           <div className="text-center py-8 space-y-4">
-            <p className="text-sm text-white/50">
+            <p className="text-sm text-stone-500">
               {hasPhoto
                 ? 'The AI will analyze your photo and suggest plant details, care requirements, and a care schedule.'
                 : `The AI will suggest plant details and care requirements for "${plantName}".`}
             </p>
-            <div className="text-xs text-white/30 space-y-1">
+            <div className="text-xs text-stone-400 space-y-1">
               <p>⚠️ AI suggestions may not be accurate. Always verify before accepting.</p>
               <p>Verification links will be provided for each suggestion.</p>
             </div>
             <button
               onClick={startIdentification}
-              className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 hover:bg-emerald-400 transition-all active:scale-[0.98]"
+              className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 hover:bg-emerald-400 transition-all active:scale-[0.98]"
             >
               <Sparkles className="h-4 w-4" />
               Identify Plant
@@ -161,31 +161,31 @@ export function AiSuggestionOverlay({
         {state === 'loading' && (
           <div className="text-center py-12">
             <Loader2 className="h-8 w-8 animate-spin mx-auto text-emerald-400 mb-4" />
-            <p className="text-sm text-white/60">Analyzing plant information...</p>
-            <p className="text-xs text-white/30 mt-1">This may take a few seconds</p>
+            <p className="text-sm text-stone-500">Analyzing plant information...</p>
+            <p className="text-xs text-stone-400 mt-1">This may take a few seconds</p>
           </div>
         )}
 
         {state === 'error' && (
           <div className="space-y-4">
-            <div className="flex items-start gap-2 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
+            <div className="flex items-start gap-2 rounded-xl bg-red-50 border border-red-200/50 px-4 py-3 text-sm text-red-600">
               <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
               <div>
                 <p className="font-medium">AI identification failed</p>
-                <p className="text-red-300/70 mt-0.5">{error || 'Unknown error'}</p>
+                <p className="text-red-600/70 mt-0.5">{error || 'Unknown error'}</p>
               </div>
             </div>
             <div className="flex gap-2">
               <button
                 onClick={startIdentification}
-                className="flex-1 rounded-xl bg-emerald-500/20 px-4 py-2.5 text-sm font-medium text-emerald-300 hover:bg-emerald-500/30 transition-all flex items-center justify-center gap-2"
+                className="flex-1 rounded-xl bg-emerald-100 px-4 py-2.5 text-sm font-medium text-emerald-700 hover:bg-emerald-200 transition-all flex items-center justify-center gap-2"
               >
                 <RefreshCw className="h-4 w-4" />
                 Try Again
               </button>
               <button
                 onClick={onDismiss}
-                className="flex-1 rounded-xl border border-white/10 px-4 py-2.5 text-sm text-white/50 hover:text-white hover:bg-white/5 transition-all"
+                className="flex-1 rounded-xl border border-stone-200/50 px-4 py-2.5 text-sm text-stone-500 hover:text-stone-800 hover:bg-stone-100/50 transition-all"
               >
                 Cancel
               </button>
@@ -199,7 +199,7 @@ export function AiSuggestionOverlay({
             <div className="space-y-3">
               <div>
                 <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-white">Plant Name</p>
+                  <p className="text-sm font-medium text-stone-800">Plant Name</p>
                   <div className="flex gap-1">
                     {VERIFY_SITES.map((site) => (
                       <a
@@ -207,7 +207,7 @@ export function AiSuggestionOverlay({
                         href={site.url(result.common_name)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="rounded-lg bg-white/5 px-2 py-1 text-xs text-white/50 hover:text-white hover:bg-white/10 transition-all flex items-center gap-1"
+                        className="rounded-lg bg-stone-100/50 px-2 py-1 text-xs text-stone-500 hover:text-stone-800 hover:bg-stone-200/50 transition-all flex items-center gap-1"
                         title={`Verify on ${site.name}`}
                       >
                         <span>{site.icon}</span>
@@ -216,10 +216,10 @@ export function AiSuggestionOverlay({
                     ))}
                   </div>
                 </div>
-                <p className="text-white font-medium mt-0.5">
+                <p className="text-stone-800 font-medium mt-0.5">
                   {result.common_name}
                   {result.scientific_name && (
-                    <span className="text-white/40 italic ml-2 font-normal">
+                    <span className="text-stone-400 italic ml-2 font-normal">
                       {result.scientific_name}
                     </span>
                   )}
@@ -228,28 +228,25 @@ export function AiSuggestionOverlay({
 
               <div className="grid grid-cols-2 gap-3 text-sm">
                 {result.light_requirement && (
-                  <div className="rounded-lg bg-white/5 p-3">
-                    <p className="text-xs text-white/40 mb-0.5">Light</p>
-                    <p className="text-white">☀️ {LIGHT_REQUIREMENT_LABELS[result.light_requirement]}</p>
+                  <div className="rounded-lg bg-stone-100/50 p-3">
+                    <p className="text-xs text-stone-400 mb-0.5">Light</p>
+                    <p className="text-stone-800">☀️ {LIGHT_REQUIREMENT_LABELS[result.light_requirement]}</p>
                   </div>
                 )}
-                <div className="rounded-lg bg-white/5 p-3">
-                  <p className="text-xs text-white/40 mb-0.5">Temperature</p>
-                  <p className="text-white">🌡️ {result.min_temp}°C – {result.max_temp}°C</p>
+                <div className="rounded-lg bg-stone-100/50 p-3"><p className="text-xs text-stone-400 mb-0.5">Temperature</p>
+                    <p className="text-stone-800">🌡️ {result.min_temp}°C – {result.max_temp}°C</p>
                 </div>
-                <div className="rounded-lg bg-white/5 p-3">
-                  <p className="text-xs text-white/40 mb-0.5">Humidity</p>
-                  <p className="text-white">💧 {result.humidity_min}%+</p>
+                <div className="rounded-lg bg-stone-100/50 p-3"><p className="text-xs text-stone-400 mb-0.5">Humidity</p>
+                    <p className="text-stone-800">💧 {result.humidity_min}%+</p>
                 </div>
-                <div className="rounded-lg bg-white/5 p-3">
-                  <p className="text-xs text-white/40 mb-0.5">Care Tasks</p>
-                  <p className="text-white">📋 {result.care_tasks?.length || 0} suggested</p>
+                <div className="rounded-lg bg-stone-100/50 p-3"><p className="text-xs text-stone-400 mb-0.5">Care Tasks</p>
+                    <p className="text-stone-800">📋 {result.care_tasks?.length || 0} suggested</p>
                 </div>
               </div>
 
               {result.notes && (
-                <div className="text-sm text-white/60 bg-white/5 rounded-xl p-3">
-                  <p className="text-xs text-white/30 mb-1">Care Notes</p>
+                <div className="text-sm text-stone-600 bg-stone-100/50 rounded-xl p-3">
+                  <p className="text-xs text-stone-400 mb-1">Care Notes</p>
                   <p>{result.notes}</p>
                 </div>
               )}
@@ -257,18 +254,18 @@ export function AiSuggestionOverlay({
               {/* Care tasks */}
               {result.care_tasks && result.care_tasks.length > 0 && (
                 <div>
-                  <p className="text-xs font-medium text-white/40 uppercase tracking-wider mb-2">
+                  <p className="text-xs font-medium text-stone-400 uppercase tracking-wider mb-2">
                     Suggested Care Schedule
                   </p>
                   <div className="space-y-1.5">
                     {result.care_tasks.map((task, i) => (
-                      <div key={i} className="flex items-center gap-2 text-xs text-white/60 bg-white/[0.03] rounded-lg px-3 py-2">
+                      <div key={i} className="flex items-center gap-2 text-xs text-stone-500 bg-stone-100/30 rounded-lg px-3 py-2">
                         <span>{TASK_TYPE_LABELS[task.task_type]}</span>
-                        <span className="text-white/30">·</span>
+                        <span className="text-stone-400">·</span>
                         <span>Every {task.frequency_days}d</span>
                         {task.amount && (
                           <>
-                            <span className="text-white/30">·</span>
+                            <span className="text-stone-400">·</span>
                             <span>{task.amount}</span>
                           </>
                         )}
@@ -280,14 +277,14 @@ export function AiSuggestionOverlay({
 
               {/* Fallback warning (user's provider failed, using default) */}
               {fallbackWarning && (
-                <div className="flex items-start gap-2 rounded-xl bg-amber-500/10 border border-amber-500/20 px-4 py-3 text-xs text-amber-300">
+                <div className="flex items-start gap-2 rounded-xl bg-amber-50 border border-amber-200/50 px-4 py-3 text-xs text-amber-700">
                   <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
                   <p>{fallbackWarning}</p>
                 </div>
               )}
 
               {/* Verify warning */}
-              <div className="flex items-start gap-2 rounded-xl bg-amber-500/10 border border-amber-500/20 px-4 py-3 text-xs text-amber-300">
+              <div className="flex items-start gap-2 rounded-xl bg-amber-50 border border-amber-200/50 px-4 py-3 text-xs text-amber-700">
                 <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
                 <p>
                   AI-generated information may be inaccurate. Use the verification links above to check
@@ -300,14 +297,14 @@ export function AiSuggestionOverlay({
             <div className="flex gap-2 pt-2">
               <button
                 onClick={() => onAccept(result)}
-                className="flex-1 rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 hover:bg-emerald-400 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                className="flex-1 rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 hover:bg-emerald-400 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
               >
                 <CheckCircle2 className="h-4 w-4" />
                 Accept & Fill Form
               </button>
               <button
                 onClick={onDismiss}
-                className="rounded-xl border border-white/10 px-4 py-2.5 text-sm text-white/50 hover:text-white hover:bg-white/5 transition-all flex items-center gap-2"
+                className="rounded-xl border border-stone-200/50 px-4 py-2.5 text-sm text-stone-500 hover:text-stone-800 hover:bg-stone-100/50 transition-all flex items-center gap-2"
               >
                 <X className="h-4 w-4" />
                 Dismiss
@@ -337,10 +334,10 @@ export function AiIdentifyButton({
       disabled={!enabled || loading}
       className={`relative rounded-xl px-3 py-2 text-xs font-medium transition-all flex items-center gap-1.5 ${
         !enabled
-          ? 'bg-white/5 text-white/20 cursor-not-allowed'
+          ? 'bg-stone-100/50 text-stone-300 cursor-not-allowed'
           : loading
-          ? 'bg-emerald-500/20 text-emerald-300'
-          : 'bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 active:scale-[0.98]'
+          ? 'bg-emerald-100 text-emerald-600'
+          : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200 active:scale-[0.98]'
       }`}
       title={enabled ? 'Identify with AI' : 'AI not configured — configure in Settings'}
     >
@@ -351,10 +348,10 @@ export function AiIdentifyButton({
       )}
       {loading ? 'Identifying...' : 'AI Identify'}
       {!enabled && (
-        <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-gray-500" />
+        <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-stone-400" />
       )}
       {enabled && !loading && (
-        <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+        <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
       )}
     </button>
   );
@@ -398,7 +395,7 @@ export function AiNicknameButton({
         type="button"
         onClick={generateNickname}
         disabled={!enabled || generating || !plantName}
-        className="rounded-lg bg-white/5 px-2.5 py-1.5 text-xs text-white/40 hover:text-white hover:bg-white/10 disabled:opacity-30 transition-all flex items-center gap-1"
+        className="rounded-lg bg-stone-100/50 px-2.5 py-1.5 text-xs text-stone-400 hover:text-stone-800 hover:bg-stone-200/50 disabled:opacity-30 transition-all flex items-center gap-1"
         title="Generate nickname suggestions"
       >
         {generating ? (
@@ -409,7 +406,7 @@ export function AiNicknameButton({
         Generate
       </button>
       {error && (
-        <p className="text-xs text-red-400 mt-1">{error}</p>
+        <p className="text-xs text-red-600 mt-1">{error}</p>
       )}
     </div>
   );

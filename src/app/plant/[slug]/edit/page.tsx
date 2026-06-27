@@ -268,7 +268,7 @@ export default function EditPlantPage({
   if (fetching) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-400/30 border-t-emerald-400" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500/30 border-t-emerald-500" />
       </div>
     );
   }
@@ -285,40 +285,40 @@ export default function EditPlantPage({
   return (
     <div className="max-w-2xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white">Edit Plant</h1>
-        <p className="mt-1 text-white/50">{formData.common_name || 'Unnamed plant'}</p>
+        <h1 className="text-3xl font-bold text-stone-800">Edit Plant</h1>
+        <p className="mt-1 text-stone-500">{formData.common_name || 'Unnamed plant'}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Basic info */}
         <div className="glass-card rounded-2xl p-6 sm:p-8 space-y-4">
-          <h2 className="text-lg font-semibold text-white">Basic Info</h2>
+          <h2 className="text-lg font-semibold text-stone-800">Basic Info</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-white/70 mb-1.5">
-                Common Name <span className="text-red-400">*</span>
+              <label className="block text-sm font-medium text-stone-600 mb-1.5">
+                Common Name <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 value={formData.common_name}
                 onChange={(e) => handleChange('common_name', e.target.value)}
                 required
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
+                className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
               />
             </div>
-            <input placeholder="Scientific name" value={formData.scientific_name} onChange={(e) => handleChange('scientific_name', e.target.value)} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all" />
-            <input placeholder="Nickname" value={formData.nickname} onChange={(e) => handleChange('nickname', e.target.value)} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all" />
-            <input placeholder="Location" value={formData.location} onChange={(e) => handleChange('location', e.target.value)} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all" />
-            <input type="date" value={formData.adopted_at} onChange={(e) => handleChange('adopted_at', e.target.value)} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all [color-scheme:dark]" />
-            <select value={formData.light_requirement} onChange={(e) => handleChange('light_requirement', e.target.value)} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all">
-              <option value="" className="bg-[#0a1f1a]">Light requirement...</option>
+            <input placeholder="Scientific name" value={formData.scientific_name} onChange={(e) => handleChange('scientific_name', e.target.value)} className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all" />
+            <input placeholder="Nickname" value={formData.nickname} onChange={(e) => handleChange('nickname', e.target.value)} className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all" />
+            <input placeholder="Location" value={formData.location} onChange={(e) => handleChange('location', e.target.value)} className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all" />
+            <input type="date" value={formData.adopted_at} onChange={(e) => handleChange('adopted_at', e.target.value)} className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all" />
+            <select value={formData.light_requirement} onChange={(e) => handleChange('light_requirement', e.target.value)} className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all">
+              <option value="" className="bg-white">Light requirement...</option>
               {(Object.entries(LIGHT_REQUIREMENT_LABELS) as [LightRequirement, string][]).map(([k, l]) => (
-                <option key={k} value={k} className="bg-[#0a1f1a]">{l}</option>
+                <option key={k} value={k} className="bg-white">{l}</option>
               ))}
             </select>
-            <input type="number" placeholder="Min temp (°C)" value={formData.min_temp} onChange={(e) => handleChange('min_temp', e.target.value)} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all" />
-            <input type="number" placeholder="Max temp (°C)" value={formData.max_temp} onChange={(e) => handleChange('max_temp', e.target.value)} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all" />
-            <input type="number" placeholder="Min humidity (%)" value={formData.humidity_min} onChange={(e) => handleChange('humidity_min', e.target.value)} min={0} max={100} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all" />
+            <input type="number" placeholder="Min temp (°C)" value={formData.min_temp} onChange={(e) => handleChange('min_temp', e.target.value)} className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all" />
+            <input type="number" placeholder="Max temp (°C)" value={formData.max_temp} onChange={(e) => handleChange('max_temp', e.target.value)} className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all" />
+            <input type="number" placeholder="Min humidity (%)" value={formData.humidity_min} onChange={(e) => handleChange('humidity_min', e.target.value)} min={0} max={100} className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all" />
             <div className="sm:col-span-2">
               <textarea placeholder="Notes..." value={formData.notes} onChange={(e) => handleChange('notes', e.target.value)} rows={3} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all resize-none" />
             </div>
@@ -327,8 +327,8 @@ export default function EditPlantPage({
 
         {/* Care Tasks */}
         <div className="glass-card rounded-2xl p-6 sm:p-8 space-y-4">
-          <h2 className="text-lg font-semibold text-white">Care Schedule</h2>
-          <p className="text-sm text-white/40">Configure how often each care task should be done.</p>
+          <h2 className="text-lg font-semibold text-stone-800">Care Schedule</h2>
+          <p className="text-sm text-stone-400">Configure how often each care task should be done.</p>
 
           <div className="space-y-3">
             {allTaskTypes.map((taskType) => {
@@ -337,40 +337,40 @@ export default function EditPlantPage({
                 <div key={taskType} className="glass-card rounded-xl p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <span className="text-lg">{getTaskIcon(taskType)}</span>
-                    <span className="text-sm font-medium text-white">
+                    <span className="text-sm font-medium text-stone-800">
                       {TASK_TYPE_LABELS[taskType]}
                     </span>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
-                      <label className="block text-xs text-white/40 mb-1">Frequency (days)</label>
+                      <label className="block text-xs text-stone-400 mb-1">Frequency (days)</label>
                       <input
                         type="number"
                         value={task?.frequency_days || ''}
                         onChange={(e) => updateCareTask(taskType, 'frequency_days', e.target.value)}
                         placeholder="e.g. 7"
                         min={1}
-                        className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none transition-all"
+                        className="w-full rounded-lg border border-stone-200/50 bg-white/80 px-3 py-1.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none transition-all"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-white/40 mb-1">Amount</label>
+                      <label className="block text-xs text-stone-400 mb-1">Amount</label>
                       <input
                         type="text"
                         value={task?.amount || ''}
                         onChange={(e) => updateCareTask(taskType, 'amount', e.target.value)}
                         placeholder="e.g. 200ml"
-                        className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none transition-all"
+                        className="w-full rounded-lg border border-stone-200/50 bg-white/80 px-3 py-1.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none transition-all"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-white/40 mb-1">Notes</label>
+                      <label className="block text-xs text-stone-400 mb-1">Notes</label>
                       <input
                         type="text"
                         value={task?.notes || ''}
                         onChange={(e) => updateCareTask(taskType, 'notes', e.target.value)}
                         placeholder="Optional instructions"
-                        className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none transition-all"
+                        className="w-full rounded-lg border border-stone-200/50 bg-white/80 px-3 py-1.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none transition-all"
                       />
                     </div>
                   </div>
@@ -381,7 +381,7 @@ export default function EditPlantPage({
         </div>
 
         {error && (
-          <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
+          <div className="rounded-xl bg-red-50 border border-red-200/50 px-4 py-3 text-sm text-red-600">
             {error}
           </div>
         )}
@@ -390,7 +390,7 @@ export default function EditPlantPage({
           <button
             type="button"
             onClick={() => router.back()}
-            className="rounded-xl border border-white/10 px-6 py-2.5 text-sm font-medium text-white/60 hover:text-white hover:bg-white/5 transition-all"
+            className="rounded-xl border border-stone-200/50 px-6 py-2.5 text-sm font-medium text-stone-500 hover:text-stone-800 hover:bg-stone-100/50 transition-all"
           >
             Cancel
           </button>

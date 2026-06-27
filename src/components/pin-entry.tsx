@@ -76,18 +76,18 @@ export default function PinEntry({ redirectTo }: PinEntryProps) {
   return (
     <div className="glass-card rounded-2xl p-8">
       <div className="mb-8 text-center">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500/20">
-          <Lock className="h-6 w-6 text-emerald-400" />
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100">
+          <Lock className="h-6 w-6 text-emerald-600" />
         </div>
-        <h1 className="text-2xl font-bold text-white">Enter PIN</h1>
-        <p className="mt-2 text-sm text-white/50">
+        <h1 className="text-2xl font-bold text-stone-800">Enter PIN</h1>
+        <p className="mt-2 text-sm text-stone-500">
           Enter the household PIN to access Plantcaer
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {error && (
-          <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400 text-center">
+          <div className="rounded-xl bg-red-50 border border-red-200/50 px-4 py-3 text-sm text-red-600 text-center">
             {error}
           </div>
         )}
@@ -99,8 +99,8 @@ export default function PinEntry({ redirectTo }: PinEntryProps) {
               key={i}
               className={`h-3.5 w-3.5 rounded-full transition-all duration-150 ${
                 pin.length > i
-                  ? 'bg-emerald-400 scale-110'
-                  : 'bg-white/20'
+                  ? 'bg-emerald-500 scale-110'
+                  : 'bg-stone-300'
               }`}
             />
           ))}
@@ -115,7 +115,7 @@ export default function PinEntry({ redirectTo }: PinEntryProps) {
               setPin(e.target.value.replace(/[^0-9]/g, ''));
               setError(null);
             }}
-            className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-center text-lg tracking-[0.5em] text-white focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
+            className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-3 text-center text-lg tracking-[0.5em] text-stone-900 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
             placeholder="Enter PIN"
             autoFocus
             inputMode="numeric"
@@ -124,7 +124,7 @@ export default function PinEntry({ redirectTo }: PinEntryProps) {
           <button
             type="button"
             onClick={() => setShowPin(!showPin)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 transition-colors"
           >
             {showPin ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
@@ -137,7 +137,7 @@ export default function PinEntry({ redirectTo }: PinEntryProps) {
               key={d}
               type="button"
               onClick={() => handleDigitClick(String(d))}
-              className="h-14 rounded-xl bg-white/5 text-lg font-medium text-white hover:bg-white/10 active:bg-white/15 active:scale-95 transition-all"
+              className="h-14 rounded-xl bg-stone-100/50 text-lg font-medium text-stone-800 hover:bg-stone-200/50 active:bg-stone-200/80 active:scale-95 transition-all"
             >
               {d}
             </button>
@@ -153,7 +153,7 @@ export default function PinEntry({ redirectTo }: PinEntryProps) {
           <button
             type="button"
             onClick={handleBackspace}
-            className="h-14 rounded-xl bg-white/5 text-sm text-white/50 hover:bg-white/10 active:scale-95 transition-all"
+            className="h-14 rounded-xl bg-stone-100/50 text-sm text-stone-500 hover:bg-stone-200/50 active:scale-95 transition-all"
           >
             ⌫
           </button>
@@ -162,7 +162,7 @@ export default function PinEntry({ redirectTo }: PinEntryProps) {
         <button
           type="submit"
           disabled={!pin || loading}
-          className="w-full rounded-xl bg-emerald-500 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
+          className="w-full rounded-xl bg-emerald-500 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
         >
           {loading ? (
             <span className="flex items-center justify-center gap-2">

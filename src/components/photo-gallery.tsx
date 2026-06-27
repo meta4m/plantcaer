@@ -128,16 +128,16 @@ export function PhotoGallery({ plantId, photos, onPhotosChanged }: PhotoGalleryP
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-white">
+        <h2 className="text-lg font-semibold text-stone-800">
           Photos
           {photos.length > 0 && (
-            <span className="text-sm font-normal text-white/40 ml-2">
+            <span className="text-sm font-normal text-stone-400 ml-2">
               ({photos.length})
             </span>
           )}
         </h2>
         <label className="cursor-pointer">
-          <div className="glass-card rounded-xl px-3 py-1.5 text-xs font-medium text-white/60 hover:text-white hover:bg-white/10 transition-all flex items-center gap-1.5">
+          <div className="glass-card rounded-xl px-3 py-1.5 text-xs font-medium text-stone-500 hover:text-stone-800 hover:bg-stone-100/80 transition-all flex items-center gap-1.5">
             {uploading ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
             ) : (
@@ -157,14 +157,14 @@ export function PhotoGallery({ plantId, photos, onPhotosChanged }: PhotoGalleryP
       </div>
 
       {uploadError && (
-        <p className="text-xs text-red-400 mb-3">{uploadError}</p>
+        <p className="text-xs text-red-600 mb-3">{uploadError}</p>
       )}
 
       {photos.length === 0 ? (
         <div className="glass-card rounded-2xl p-6 text-center">
-          <Camera className="h-8 w-8 mx-auto text-white/20 mb-2" />
-          <p className="text-sm text-white/30">No photos yet</p>
-          <p className="text-xs text-white/20 mt-1">
+          <Camera className="h-8 w-8 mx-auto text-stone-300 mb-2" />
+          <p className="text-sm text-stone-400">No photos yet</p>
+          <p className="text-xs text-stone-400 mt-1">
             Add photos to track your plant&apos;s growth over time
           </p>
         </div>

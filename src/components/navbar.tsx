@@ -54,7 +54,7 @@ export function Navbar() {
             <div className="flex items-center gap-6">
               <Link href="/" className="flex items-center gap-2">
                 <span className="text-xl">🪴</span>
-                <span className="text-lg font-bold text-white">plantcaer</span>
+                <span className="text-lg font-bold text-stone-800">plantcaer</span>
               </Link>
               <div className="hidden sm:flex items-center gap-1">
                 {navLinks.map((link) => (
@@ -63,8 +63,8 @@ export function Navbar() {
                     href={link.href}
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                       pathname === link.href
-                        ? 'bg-emerald-500/20 text-emerald-300'
-                        : 'text-white/60 hover:text-white hover:bg-white/5'
+                        ? 'bg-emerald-100 text-emerald-700'
+                        : 'text-stone-500 hover:text-stone-800 hover:bg-stone-100/50'
                     }`}
                   >
                     {link.label}
@@ -77,9 +77,9 @@ export function Navbar() {
               <div className="relative">
                 <button
                   onClick={() => setMenuOpen(!menuOpen)}
-                  className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white/70 hover:text-white hover:bg-white/10 transition-all"
+                  className="flex items-center gap-2 rounded-lg border border-stone-200/50 bg-amber-50/50 px-3 py-1.5 text-sm text-stone-600 hover:text-stone-800 hover:bg-stone-100/80 transition-all"
                 >
-                  <span className="h-6 w-6 rounded-full bg-emerald-500/20 flex items-center justify-center text-xs text-emerald-300">
+                  <span className="h-6 w-6 rounded-full bg-emerald-100 flex items-center justify-center text-xs text-emerald-600">
                     {user.email?.[0]?.toUpperCase() || '?'}
                   </span>
                   <span className="hidden sm:inline">{user.email}</span>
@@ -92,13 +92,13 @@ export function Navbar() {
                       <Link
                         href="/settings"
                         onClick={() => setMenuOpen(false)}
-                        className="block w-full px-4 py-2 text-left text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+                        className="block w-full px-4 py-2 text-left text-sm text-stone-500 hover:text-stone-800 hover:bg-stone-100/50 transition-colors"
                       >
                         Settings
                       </Link>
                       <button
                         onClick={handleSignOut}
-                        className="w-full px-4 py-2 text-left text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+                        className="w-full px-4 py-2 text-left text-sm text-stone-500 hover:text-stone-800 hover:bg-stone-100/50 transition-colors"
                       >
                         Sign out
                       </button>

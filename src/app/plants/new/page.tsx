@@ -201,8 +201,8 @@ export default function AddPlantPage() {
     <div className="max-w-2xl mx-auto">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white">Add a Plant</h1>
-          <p className="mt-1 text-white/50">Add a new plant to your collection.</p>
+          <h1 className="text-3xl font-bold text-stone-800">Add a Plant</h1>
+          <p className="mt-1 text-stone-500">Add a new plant to your collection.</p>
         </div>
         {/* AI Identify button in the header */}
         <AiIdentifyButton
@@ -214,13 +214,13 @@ export default function AddPlantPage() {
 
       <form onSubmit={handleSubmit} className="glass-card rounded-2xl p-6 sm:p-8 space-y-6">
         {error && (
-          <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
+          <div className="rounded-xl bg-red-50 border border-red-200/50 px-4 py-3 text-sm text-red-600">
             {error}
           </div>
         )}
 
         {aiAppliedWarning && (
-          <div className="rounded-xl bg-amber-500/10 border border-amber-500/20 px-4 py-3 text-sm text-amber-300">
+          <div className="rounded-xl bg-amber-50 border border-amber-200/50 px-4 py-3 text-sm text-amber-700">
             {aiAppliedWarning}
           </div>
         )}
@@ -239,8 +239,8 @@ export default function AddPlantPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="sm:col-span-2">
-            <label className="block text-sm font-medium text-white/70 mb-1.5">
-              Common Name <span className="text-red-400">*</span>
+            <label className="block text-sm font-medium text-stone-600 mb-1.5">
+              Common Name <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -248,23 +248,23 @@ export default function AddPlantPage() {
               onChange={(e) => handleChange('common_name', e.target.value)}
               placeholder="e.g. Monstera Deliciosa"
               required
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
+              className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1.5">Scientific Name</label>
+            <label className="block text-sm font-medium text-stone-600 mb-1.5">Scientific Name</label>
             <input
               type="text"
               value={formData.scientific_name}
               onChange={(e) => handleChange('scientific_name', e.target.value)}
               placeholder="e.g. Monstera deliciosa"
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
+              className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1.5">Nickname</label>
+            <label className="block text-sm font-medium text-stone-600 mb-1.5">Nickname</label>
             <div className="flex gap-2">
               <input
                 type="text"
@@ -282,37 +282,37 @@ export default function AddPlantPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1.5">Location</label>
+            <label className="block text-sm font-medium text-stone-600 mb-1.5">Location</label>
             <input
               type="text"
               value={formData.location}
               onChange={(e) => handleChange('location', e.target.value)}
               placeholder="e.g. Living room window"
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
+              className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1.5">Adoption Date</label>
+            <label className="block text-sm font-medium text-stone-600 mb-1.5">Adoption Date</label>
             <input
               type="date"
               value={formData.adopted_at}
               onChange={(e) => handleChange('adopted_at', e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all [color-scheme:dark]"
+              className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1.5">Light Requirement</label>
+            <label className="block text-sm font-medium text-stone-600 mb-1.5">Light Requirement</label>
             <select
               value={formData.light_requirement}
               onChange={(e) => handleChange('light_requirement', e.target.value)}
               className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
             >
-              <option value="" className="bg-[#0a1f1a]">Select...</option>
+              <option value="" className="bg-white">Select...</option>
               {(Object.entries(LIGHT_REQUIREMENT_LABELS) as [LightRequirement, string][]).map(
                 ([key, label]) => (
-                  <option key={key} value={key} className="bg-[#0a1f1a]">
+                  <option key={key} value={key} className="bg-white">
                     {label}
                   </option>
                 )
@@ -321,29 +321,29 @@ export default function AddPlantPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1.5">Min Temp (°C)</label>
+            <label className="block text-sm font-medium text-stone-600 mb-1.5">Min Temp (°C)</label>
             <input
               type="number"
               value={formData.min_temp}
               onChange={(e) => handleChange('min_temp', e.target.value)}
               placeholder="e.g. 15"
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
+              className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1.5">Max Temp (°C)</label>
+            <label className="block text-sm font-medium text-stone-600 mb-1.5">Max Temp (°C)</label>
             <input
               type="number"
               value={formData.max_temp}
               onChange={(e) => handleChange('max_temp', e.target.value)}
               placeholder="e.g. 30"
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
+              className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1.5">
+            <label className="block text-sm font-medium text-stone-600 mb-1.5">
               Min Humidity (%)
             </label>
             <input
@@ -353,12 +353,12 @@ export default function AddPlantPage() {
               placeholder="e.g. 60"
               min={0}
               max={100}
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
+              className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
             />
           </div>
 
           <div className="sm:col-span-2">
-            <label className="block text-sm font-medium text-white/70 mb-1.5">Notes</label>
+            <label className="block text-sm font-medium text-stone-600 mb-1.5">Notes</label>
             <textarea
               value={formData.notes}
               onChange={(e) => handleChange('notes', e.target.value)}
@@ -373,14 +373,14 @@ export default function AddPlantPage() {
           <button
             type="button"
             onClick={() => router.back()}
-            className="rounded-xl border border-white/10 px-6 py-2.5 text-sm font-medium text-white/60 hover:text-white hover:bg-white/5 transition-all"
+            className="rounded-xl border border-stone-200/50 px-6 py-2.5 text-sm font-medium text-stone-500 hover:text-stone-800 hover:bg-stone-100/50 transition-all"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={loading || !formData.common_name}
-            className="flex-1 sm:flex-none rounded-xl bg-emerald-500 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
+            className="flex-1 sm:flex-none rounded-xl bg-emerald-500 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">

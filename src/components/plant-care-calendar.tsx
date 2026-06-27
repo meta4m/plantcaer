@@ -271,29 +271,29 @@ export function PlantCareCalendar({ events, plants }: PlantCareCalendarProps) {
         <div className="flex items-center gap-2">
           <button
             onClick={goPrev}
-            className="glass-card rounded-xl p-1.5 text-white/60 hover:text-white hover:bg-white/10 transition-all"
+            className="glass-card rounded-xl p-1.5 text-stone-500 hover:text-stone-800 hover:bg-stone-100/80 transition-all"
             title="Previous month"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
           <button
             onClick={goToday}
-            className="glass-card rounded-xl px-3 py-1.5 text-xs font-medium text-white/60 hover:text-white hover:bg-white/10 transition-all"
+            className="glass-card rounded-xl px-3 py-1.5 text-xs font-medium text-stone-500 hover:text-stone-800 hover:bg-stone-100/80 transition-all"
           >
             Today
           </button>
           <button
             onClick={goNext}
-            className="glass-card rounded-xl p-1.5 text-white/60 hover:text-white hover:bg-white/10 transition-all"
+            className="glass-card rounded-xl p-1.5 text-stone-500 hover:text-stone-800 hover:bg-stone-100/80 transition-all"
             title="Next month"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
-          <h2 className="text-lg font-semibold text-white ml-2">{currentTitle}</h2>
+          <h2 className="text-lg font-semibold text-stone-800 ml-2">{currentTitle}</h2>
         </div>
 
         {/* Legend */}
-        <div className="flex items-center gap-3 text-[11px] text-white/40">
+        <div className="flex items-center gap-3 text-[11px] text-stone-400">
           <div className="flex items-center gap-1">
             <span className="h-2 w-2 rounded-full" style={{ backgroundColor: TASK_COLORS.watering }} />
             Due
@@ -318,7 +318,7 @@ export function PlantCareCalendar({ events, plants }: PlantCareCalendarProps) {
               padding: 4px 0;
             }
             .plant-care-calendar .fc-col-header-cell-cushion {
-              color: rgba(255, 255, 255, 0.5) !important;
+              color: rgba(87, 83, 78, 0.7) !important;
               font-size: 0.75rem;
               font-weight: 500;
               text-transform: uppercase;
@@ -326,7 +326,7 @@ export function PlantCareCalendar({ events, plants }: PlantCareCalendarProps) {
               text-decoration: none !important;
             }
             .plant-care-calendar .fc-daygrid-day-number {
-              color: rgba(255, 255, 255, 0.4) !important;
+              color: rgba(87, 83, 78, 0.6) !important;
               font-size: 0.875rem;
               text-decoration: none !important;
             }
@@ -334,17 +334,17 @@ export function PlantCareCalendar({ events, plants }: PlantCareCalendarProps) {
               background: transparent !important;
             }
             .plant-care-calendar .fc-daygrid-day.fc-day-other .fc-daygrid-day-number {
-              color: rgba(255, 255, 255, 0.15) !important;
+              color: rgba(168, 162, 158, 0.4) !important;
             }
             .plant-care-calendar .fc-daygrid-day-frame {
               cursor: pointer;
             }
-            .plant-care-calendar .fc-daygrid-more-link {
-              color: #34d399 !important;
+            .plant-care-calendar .fc-more-link {
+              color: #059669 !important;
               font-size: 0.75rem;
             }
-            .plant-care-calendar .fc-daygrid-more-link:hover {
-              color: #6ee7b7 !important;
+            .plant-care-calendar .fc-more-link:hover {
+              color: #10b981 !important;
             }
             .plant-care-calendar .fc-daygrid-day-events {
               min-height: 0 !important;
@@ -357,13 +357,13 @@ export function PlantCareCalendar({ events, plants }: PlantCareCalendarProps) {
               background: transparent !important;
             }
             .plant-care-calendar td {
-              border-color: rgba(255, 255, 255, 0.05) !important;
+              border-color: rgba(214, 211, 209, 0.3) !important;
             }
             .plant-care-calendar .fc-scrollgrid {
-              border-color: rgba(255, 255, 255, 0.05) !important;
+              border-color: rgba(214, 211, 209, 0.3) !important;
             }
             .plant-care-calendar .fc-daygrid-body tr {
-              border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+              border-bottom: 1px solid rgba(214, 211, 209, 0.3);
             }
           `}</style>
           <FullCalendar
@@ -431,11 +431,11 @@ export function PlantCareCalendar({ events, plants }: PlantCareCalendarProps) {
                 <ChevronLeft className="h-4 w-4" />
               </button>
               <div className="text-center">
-                <p className="text-sm font-medium text-white">
+                <p className="text-sm font-medium text-stone-800">
                   {formatFriendlyDate(modalState.dateStr)}
                 </p>
                 {modalEvents.length > 0 && (
-                  <p className="text-xs text-white/40">
+                  <p className="text-xs text-stone-400">
                     {modalEvents.length} task{modalEvents.length !== 1 ? 's' : ''}
                     {modalEvents.length > 1 && ` · ${modalState.eventIndex + 1} of ${modalEvents.length}`}
                   </p>
@@ -488,12 +488,12 @@ export function PlantCareCalendar({ events, plants }: PlantCareCalendarProps) {
                     {TASK_TYPE_ICONS[selectedEvent.extendedProps.taskType]}
                   </span>
                   <div>
-                    <h3 className="text-lg font-semibold text-white">
+                    <h3 className="text-lg font-semibold text-stone-800">
                       {selectedEvent.title}
                     </h3>
                     <Link
                       href={`/plant/${selectedEvent.extendedProps.plantSlug}`}
-                      className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
+                      className="text-sm text-emerald-600 hover:text-emerald-500 transition-colors"
                     >
                       {selectedEvent.extendedProps.plantName}
                     </Link>
@@ -502,14 +502,14 @@ export function PlantCareCalendar({ events, plants }: PlantCareCalendarProps) {
 
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center gap-2 text-sm">
-                    <span className="text-white/40">Status:</span>
+                    <span className="text-stone-500">Status:</span>
                     <span
                       className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
                         selectedEvent.extendedProps.type === 'overdue'
-                          ? 'bg-red-500/20 text-red-300'
+                          ? 'bg-red-100 text-red-700'
                           : selectedEvent.extendedProps.type === 'logged'
-                          ? 'bg-gray-500/20 text-gray-300'
-                          : 'bg-emerald-500/20 text-emerald-300'
+                          ? 'bg-stone-200 text-stone-600'
+                          : 'bg-emerald-100 text-emerald-700'
                       }`}
                     >
                       {selectedEvent.extendedProps.type === 'overdue'
@@ -521,8 +521,8 @@ export function PlantCareCalendar({ events, plants }: PlantCareCalendarProps) {
                   </div>
                   {selectedEvent.extendedProps.careLogNotes && (
                     <div>
-                      <span className="text-white/40 text-sm">Notes:</span>
-                      <p className="text-white/70 text-sm mt-0.5 italic">
+                      <span className="text-stone-500 text-sm">Notes:</span>
+                      <p className="text-stone-600 text-sm mt-0.5 italic">
                         &ldquo;{selectedEvent.extendedProps.careLogNotes}&rdquo;
                       </p>
                     </div>
@@ -533,7 +533,7 @@ export function PlantCareCalendar({ events, plants }: PlantCareCalendarProps) {
                   <button
                     onClick={() => handleLogCare(selectedEvent)}
                     disabled={logging === selectedEvent.extendedProps.taskId}
-                    className="w-full rounded-xl bg-emerald-500/20 px-4 py-2.5 text-sm font-medium text-emerald-300 hover:bg-emerald-500/30 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+                    className="w-full rounded-xl bg-emerald-100 px-4 py-2.5 text-sm font-medium text-emerald-700 hover:bg-emerald-200 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
                   >
                     {logging === selectedEvent.extendedProps.taskId ? (
                       <>
@@ -552,7 +552,7 @@ export function PlantCareCalendar({ events, plants }: PlantCareCalendarProps) {
                 <div className="mt-3">
                   <Link
                     href={`/plant/${selectedEvent.extendedProps.plantSlug}`}
-                    className="block text-center rounded-xl bg-white/5 px-4 py-2.5 text-sm font-medium text-white/60 hover:text-white hover:bg-white/10 transition-all"
+                    className="block text-center rounded-xl bg-amber-50/50 px-4 py-2.5 text-sm font-medium text-stone-500 hover:text-stone-800 hover:bg-stone-100/80 transition-all"
                   >
                     View Plant Details
                   </Link>

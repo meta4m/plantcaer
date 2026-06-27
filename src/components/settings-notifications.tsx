@@ -126,7 +126,7 @@ export function SettingsNotifications() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-5 w-5 animate-spin text-white/40" />
+        <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
       </div>
     );
   }
@@ -135,12 +135,12 @@ export function SettingsNotifications() {
     return (
       <div>
         <div className="flex items-center gap-3 mb-6">
-          <div className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center">
-            <BellOff className="h-5 w-5 text-white/30" />
+          <div className="h-10 w-10 rounded-xl bg-stone-100/50 flex items-center justify-center">
+            <BellOff className="h-5 w-5 text-stone-400" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-white">Notifications</h2>
-            <p className="text-xs text-white/40">
+            <h2 className="text-lg font-semibold text-stone-800">Notifications</h2>
+            <p className="text-xs text-stone-400">
               Push notifications are not supported in your browser or environment.
             </p>
           </div>
@@ -153,9 +153,9 @@ export function SettingsNotifications() {
     <div>
       <div className="flex items-center gap-3 mb-6">
         <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${
-          subscribed ? 'bg-emerald-500/15' : 'bg-white/5'
+          subscribed ? 'bg-emerald-100' : 'bg-stone-100/50'
         }`}>
-          <Bell className={`h-5 w-5 ${subscribed ? 'text-emerald-400' : 'text-white/30'}`} />
+          <Bell className={`h-5 w-5 ${subscribed ? 'text-emerald-600' : 'text-stone-400'}`} />
         </div>
         <div>
           <h2 className="text-lg font-semibold text-white">Notifications</h2>
@@ -168,19 +168,19 @@ export function SettingsNotifications() {
       </div>
 
       {success && (
-        <div className="flex items-center gap-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-3 mb-4 text-sm text-emerald-300">
+        <div className="flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200/50 px-4 py-3 mb-4 text-sm text-emerald-700">
           <CheckCircle2 className="h-4 w-4 shrink-0" />
           {success}
         </div>
       )}
 
       {error && (
-        <div className="flex items-start gap-2 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 mb-4 text-sm text-red-400">
+        <div className="flex items-start gap-2 rounded-xl bg-red-50 border border-red-200/50 px-4 py-3 mb-4 text-sm text-red-600">
           <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
           <div>
             <p>{error}</p>
             {error.includes('VAPID') && (
-              <p className="text-xs text-red-300/70 mt-1">
+              <p className="text-xs text-red-600/70 mt-1">
                 Ask the app admin to set up VAPID keys in the server environment.
               </p>
             )}
@@ -189,11 +189,11 @@ export function SettingsNotifications() {
       )}
 
       <div className="space-y-4">
-        <div className="rounded-xl bg-white/[0.03] p-4">
+        <div className="rounded-xl bg-stone-100/30 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-white">Push Notifications</p>
-              <p className="text-xs text-white/40 mt-0.5">
+              <p className="text-sm font-medium text-stone-800">Push Notifications</p>
+              <p className="text-xs text-stone-400 mt-0.5">
                 {subscribed
                   ? 'You\'ll get notified about overdue and due care tasks.'
                   : 'Allow notifications to receive care reminders.'}
@@ -203,7 +203,7 @@ export function SettingsNotifications() {
               <button
                 onClick={unsubscribe}
                 disabled={subscribing}
-                className="rounded-lg bg-red-500/20 px-3 py-1.5 text-xs font-medium text-red-300 hover:bg-red-500/30 disabled:opacity-50 transition-all"
+                className="rounded-lg bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-200 disabled:opacity-50 transition-all"
               >
                 {subscribing ? 'Disabling...' : 'Disable'}
               </button>
@@ -211,7 +211,7 @@ export function SettingsNotifications() {
               <button
                 onClick={subscribe}
                 disabled={subscribing}
-                className="rounded-lg bg-emerald-500/20 px-3 py-1.5 text-xs font-medium text-emerald-300 hover:bg-emerald-500/30 disabled:opacity-50 transition-all"
+                className="rounded-lg bg-emerald-100 px-3 py-1.5 text-xs font-medium text-emerald-700 hover:bg-emerald-200 disabled:opacity-50 transition-all"
               >
                 {subscribing ? (
                   <span className="flex items-center gap-1.5">
@@ -226,7 +226,7 @@ export function SettingsNotifications() {
           </div>
         </div>
 
-        <div className="rounded-xl bg-white/[0.03] p-4">
+        <div className="rounded-xl bg-stone-100/30 p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-white">Check Frequency</p>

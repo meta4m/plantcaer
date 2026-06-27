@@ -96,8 +96,8 @@ export function CareContent({ plants, careTasks, careLogs }: CareContentProps) {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-white">Care Overview</h1>
-        <p className="mt-1 text-white/50">
+        <h1 className="text-3xl font-bold text-stone-800">Care Overview</h1>
+        <p className="mt-1 text-stone-500">
           {tasksWithPlants.length} active task{tasksWithPlants.length !== 1 ? 's' : ''}
           {overdueTasks.length > 0 && ` · ${overdueTasks.length} overdue`}
         </p>
@@ -106,13 +106,13 @@ export function CareContent({ plants, careTasks, careLogs }: CareContentProps) {
       {tasksWithPlants.length === 0 && plants.length === 0 ? (
         <div className="glass-card rounded-2xl p-12 text-center">
           <span className="text-5xl mb-4 block">🪴</span>
-          <h3 className="text-xl font-semibold text-white mb-2">No plants yet</h3>
-          <p className="text-white/40 text-sm mb-6">
+          <h3 className="text-xl font-semibold text-stone-700 mb-2">No plants yet</h3>
+          <p className="text-stone-400 text-sm mb-6">
             Add a plant first, then configure its care schedule.
           </p>
           <Link
             href="/plants/new"
-            className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 hover:bg-emerald-400 transition-all"
+            className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 hover:bg-emerald-400 transition-all"
           >
             Add Plant
           </Link>
@@ -120,13 +120,13 @@ export function CareContent({ plants, careTasks, careLogs }: CareContentProps) {
       ) : tasksWithPlants.length === 0 ? (
         <div className="glass-card rounded-2xl p-12 text-center">
           <span className="text-5xl mb-4 block">📋</span>
-          <h3 className="text-xl font-semibold text-white mb-2">No care tasks yet</h3>
-          <p className="text-white/40 text-sm mb-6">
+          <h3 className="text-xl font-semibold text-stone-700 mb-2">No care tasks yet</h3>
+          <p className="text-stone-400 text-sm mb-6">
             Configure care schedules for your plants to see them here.
           </p>
           <Link
             href="/plants"
-            className="text-emerald-400 text-sm hover:text-emerald-300 transition-colors"
+            className="text-emerald-600 text-sm hover:text-emerald-500 transition-colors"
           >
             Go to Plants
           </Link>
@@ -136,8 +136,8 @@ export function CareContent({ plants, careTasks, careLogs }: CareContentProps) {
           {/* Overdue */}
           {overdueTasks.length > 0 && (
             <section>
-              <h2 className="text-lg font-semibold text-amber-400 mb-4 flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
+              <h2 className="text-lg font-semibold text-amber-600 mb-4 flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
                 Overdue ({overdueTasks.length})
               </h2>
               <div className="space-y-2">
@@ -160,7 +160,7 @@ export function CareContent({ plants, careTasks, careLogs }: CareContentProps) {
           {/* Today */}
           {todayTasks.length > 0 && (
             <section>
-              <h2 className="text-lg font-semibold text-white mb-4">
+              <h2 className="text-lg font-semibold text-stone-800 mb-4">
                 Due Today ({todayTasks.length})
               </h2>
               <div className="space-y-2">
@@ -180,7 +180,7 @@ export function CareContent({ plants, careTasks, careLogs }: CareContentProps) {
           {/* This week */}
           {upcomingTasks.length > 0 && (
             <section>
-              <h2 className="text-lg font-semibold text-white/70 mb-4">
+              <h2 className="text-lg font-semibold text-stone-500 mb-4">
                 Later This Week ({upcomingTasks.length})
               </h2>
               <div className="space-y-2">
@@ -200,7 +200,7 @@ export function CareContent({ plants, careTasks, careLogs }: CareContentProps) {
           {/* Other */}
           {otherTasks.length > 0 && (
             <section>
-              <h2 className="text-lg font-semibold text-white/40 mb-4">
+              <h2 className="text-lg font-semibold text-stone-400 mb-4">
                 All Tasks ({otherTasks.length})
               </h2>
               <div className="space-y-2">
@@ -235,11 +235,11 @@ function TaskRow({ task, onLog, logging }: {
       <div className="flex-1 min-w-0">
         <Link
           href={`/plant/${task.plant.slug}`}
-          className="text-sm font-medium text-white hover:text-emerald-300 transition-colors"
+          className="text-sm font-medium text-stone-800 hover:text-emerald-600 transition-colors"
         >
           {task.plant.nickname || task.plant.common_name}
         </Link>
-        <p className="text-xs text-white/40">
+        <p className="text-xs text-stone-400">
           {TASK_TYPE_LABELS[task.task_type as TaskType]}
           {task.frequency_days && ` · every ${task.frequency_days}d`}
           {task.daysSinceLast !== null &&
@@ -251,8 +251,8 @@ function TaskRow({ task, onLog, logging }: {
           <span
             className={`text-xs ${
               task.daysUntilDue <= 2
-                ? 'text-amber-400'
-                : 'text-white/40'
+                ? 'text-amber-600'
+                : 'text-stone-400'
             }`}
           >
             {task.daysUntilDue === 0
@@ -265,7 +265,7 @@ function TaskRow({ task, onLog, logging }: {
         <button
           onClick={onLog}
           disabled={logging}
-          className="rounded-lg bg-emerald-500/20 px-3 py-1.5 text-xs font-medium text-emerald-300 hover:bg-emerald-500/30 disabled:opacity-50 transition-all"
+          className="rounded-lg bg-emerald-100 px-3 py-1.5 text-xs font-medium text-emerald-700 hover:bg-emerald-200 disabled:opacity-50 transition-all"
         >
           {logging ? '...' : '✓ Done'}
         </button>

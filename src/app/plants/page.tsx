@@ -40,14 +40,14 @@ export default async function PlantsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white">Plants</h1>
-          <p className="mt-1 text-white/50">
+          <h1 className="text-3xl font-bold text-stone-800">Plants</h1>
+          <p className="mt-1 text-stone-500">
             {plants?.length ?? 0} plant{plants?.length !== 1 ? 's' : ''}
           </p>
         </div>
         <Link
           href="/plants/new"
-          className="glass-card rounded-xl px-4 py-2.5 text-sm font-medium text-white hover:bg-white/10 transition-all active:scale-[0.98] flex items-center gap-2"
+          className="glass-card rounded-xl px-4 py-2.5 text-sm font-medium text-stone-700 hover:bg-stone-100/80 transition-all active:scale-[0.98] flex items-center gap-2"
         >
           <Plus className="h-4 w-4" />
           Add Plant
@@ -57,13 +57,13 @@ export default async function PlantsPage() {
       {!plants || plants.length === 0 ? (
         <div className="glass-card rounded-2xl p-12 text-center">
           <span className="text-5xl mb-4 block">🪴</span>
-          <h3 className="text-xl font-semibold text-white mb-2">No plants yet</h3>
-          <p className="text-white/40 text-sm mb-6">
+          <h3 className="text-xl font-semibold text-stone-700 mb-2">No plants yet</h3>
+          <p className="text-stone-400 text-sm mb-6">
             Add your first plant to get started.
           </p>
           <Link
             href="/plants/new"
-            className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 hover:bg-emerald-400 transition-all"
+            className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 hover:bg-emerald-400 transition-all"
           >
             <Plus className="h-4 w-4" />
             Add your first plant

@@ -59,18 +59,18 @@ export function GrowthTracking({ plantId, records }: GrowthTrackingProps) {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-          <TrendingUp className="h-4 w-4 text-emerald-400" />
+        <h2 className="text-lg font-semibold text-stone-800 flex items-center gap-2">
+          <TrendingUp className="h-4 w-4 text-emerald-600" />
           Growth Tracking
           {records.length > 0 && (
-            <span className="text-sm font-normal text-white/40 ml-1">
+            <span className="text-sm font-normal text-stone-400 ml-1">
               ({records.length} record{records.length !== 1 ? 's' : ''})
             </span>
           )}
         </h2>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="glass-card rounded-xl px-3 py-1.5 text-xs font-medium text-white/60 hover:text-white hover:bg-white/10 transition-all flex items-center gap-1.5"
+          className="glass-card rounded-xl px-3 py-1.5 text-xs font-medium text-stone-500 hover:text-stone-800 hover:bg-stone-100/80 transition-all flex items-center gap-1.5"
         >
           {showForm ? (
             'Cancel'
@@ -88,7 +88,7 @@ export function GrowthTracking({ plantId, records }: GrowthTrackingProps) {
         <form onSubmit={handleSubmit} className="glass-card rounded-2xl p-4 mb-4 space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-white/50 mb-1 flex items-center gap-1">
+              <label className="block text-xs font-medium text-stone-500 mb-1 flex items-center gap-1">
                 <Ruler className="h-3 w-3" />
                 Height (cm)
               </label>
@@ -99,11 +99,11 @@ export function GrowthTracking({ plantId, records }: GrowthTrackingProps) {
                 value={height}
                 onChange={(e) => setHeight(e.target.value)}
                 placeholder="e.g. 45"
-                className="w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-white placeholder:text-white/25 focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30 transition-all"
+                className="w-full rounded-lg bg-white/80 border border-stone-200/50 px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30 transition-all"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-white/50 mb-1 flex items-center gap-1">
+              <label className="block text-xs font-medium text-stone-500 mb-1 flex items-center gap-1">
                 <Leaf className="h-3 w-3" />
                 Leaf Count
               </label>
@@ -114,30 +114,30 @@ export function GrowthTracking({ plantId, records }: GrowthTrackingProps) {
                 value={leafCount}
                 onChange={(e) => setLeafCount(e.target.value)}
                 placeholder="e.g. 12"
-                className="w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-white placeholder:text-white/25 focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30 transition-all"
+                className="w-full rounded-lg bg-white/80 border border-stone-200/50 px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30 transition-all"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-white/50 mb-1">Date</label>
+            <label className="block text-xs font-medium text-stone-500 mb-1">Date</label>
             <input
               type="date"
               value={recordedAt}
               onChange={(e) => setRecordedAt(e.target.value)}
               max={new Date().toISOString().split('T')[0]}
-              className="w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-white focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30 transition-all"
+              className="w-full rounded-lg bg-white/80 border border-stone-200/50 px-3 py-2 text-sm text-stone-900 focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30 transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-white/50 mb-1">Notes (optional)</label>
+            <label className="block text-xs font-medium text-stone-500 mb-1">Notes (optional)</label>
             <input
               type="text"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Looking healthy, new growth..."
-              className="w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-white placeholder:text-white/25 focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30 transition-all"
+              className="w-full rounded-lg bg-white/80 border border-stone-200/50 px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30 transition-all"
             />
           </div>
 
@@ -145,7 +145,7 @@ export function GrowthTracking({ plantId, records }: GrowthTrackingProps) {
             <button
               type="submit"
               disabled={(!height && !leafCount) || saving}
-              className="rounded-lg bg-emerald-500/20 px-4 py-2 text-xs font-medium text-emerald-300 hover:bg-emerald-500/30 disabled:opacity-50 transition-all flex items-center gap-1.5"
+              className="rounded-lg bg-emerald-100 px-4 py-2 text-xs font-medium text-emerald-700 hover:bg-emerald-200 disabled:opacity-50 transition-all flex items-center gap-1.5"
             >
               {saving ? (
                 <>
@@ -162,9 +162,9 @@ export function GrowthTracking({ plantId, records }: GrowthTrackingProps) {
 
       {records.length === 0 ? (
         <div className="glass-card rounded-2xl p-6 text-center">
-          <TrendingUp className="h-8 w-8 mx-auto text-white/20 mb-2" />
-          <p className="text-sm text-white/30">No growth records yet</p>
-          <p className="text-xs text-white/20 mt-1">
+          <TrendingUp className="h-8 w-8 mx-auto text-stone-300 mb-2" />
+          <p className="text-sm text-stone-400">No growth records yet</p>
+          <p className="text-xs text-stone-400 mt-1">
             Track height, leaf count, and progress over time
           </p>
         </div>
@@ -197,7 +197,7 @@ export function GrowthTracking({ plantId, records }: GrowthTrackingProps) {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 text-sm">
-                        <span className="text-white/70 font-medium">
+                        <span className="text-stone-700 font-medium">
                           {new Date(record.recorded_at).toLocaleDateString(undefined, {
                             month: 'short',
                             day: 'numeric',
@@ -208,9 +208,9 @@ export function GrowthTracking({ plantId, records }: GrowthTrackingProps) {
 
                       <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1">
                         {record.height_cm !== null && (
-                          <span className="text-xs text-white/50 flex items-center gap-1">
+                          <span className="text-xs text-stone-500 flex items-center gap-1">
                             <Ruler className="h-3 w-3 text-emerald-400/60" />
-                            <span className="text-white/80 font-medium">{record.height_cm} cm</span>
+                            <span className="text-stone-800 font-medium">{record.height_cm} cm</span>
                             {heightDiff !== null && heightDiff > 0 && (
                               <span className="text-emerald-400/60">+{heightDiff.toFixed(1)}</span>
                             )}
@@ -220,9 +220,9 @@ export function GrowthTracking({ plantId, records }: GrowthTrackingProps) {
                           </span>
                         )}
                         {record.leaf_count !== null && (
-                          <span className="text-xs text-white/50 flex items-center gap-1">
+                          <span className="text-xs text-stone-500 flex items-center gap-1">
                             <Leaf className="h-3 w-3 text-emerald-400/60" />
-                            <span className="text-white/80 font-medium">{record.leaf_count} leaves</span>
+                            <span className="text-stone-800 font-medium">{record.leaf_count} leaves</span>
                             {leafDiff !== null && leafDiff > 0 && (
                               <span className="text-emerald-400/60">+{leafDiff}</span>
                             )}
@@ -234,7 +234,7 @@ export function GrowthTracking({ plantId, records }: GrowthTrackingProps) {
                       </div>
 
                       {record.notes && (
-                        <p className="text-xs text-white/30 mt-1 italic">&ldquo;{record.notes}&rdquo;</p>
+                        <p className="text-xs text-stone-400 mt-1 italic">&ldquo;{record.notes}&rdquo;</p>
                       )}
                     </div>
                   </div>
@@ -330,10 +330,10 @@ function GrowthChart({ records }: { records: GrowthRecord[] }) {
                 y1={y}
                 x2={WIDTH - PADDING.right}
                 y2={y}
-                stroke="rgba(255,255,255,0.06)"
+                stroke="rgba(168,162,158,0.2)"
                 strokeDasharray="4 4"
               />
-              <text x={PADDING.left - 8} y={y + 4} textAnchor="end" className="fill-white/30" fontSize="10">
+              <text x={PADDING.left - 8} y={y + 4} textAnchor="end" className="fill-stone-400" fontSize="10">
                 {tick}
               </text>
             </g>
@@ -369,7 +369,7 @@ function GrowthChart({ records }: { records: GrowthRecord[] }) {
                   cy={cy}
                   r="3"
                   fill="#34d399"
-                  stroke="#0a0a0a"
+                  stroke="#f5f0e8"
                   strokeWidth="1.5"
                 />
               );
@@ -400,7 +400,7 @@ function GrowthChart({ records }: { records: GrowthRecord[] }) {
                   cy={cy}
                   r="3"
                   fill="#818cf8"
-                  stroke="#0a0a0a"
+                  stroke="#f5f0e8"
                   strokeWidth="1.5"
                 />
               );
@@ -419,7 +419,7 @@ function GrowthChart({ records }: { records: GrowthRecord[] }) {
                 x={x}
                 y={HEIGHT - 5}
                 textAnchor="middle"
-                className="fill-white/30"
+                className="fill-stone-400"
                 fontSize="10"
               >
                 {date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
@@ -432,17 +432,17 @@ function GrowthChart({ records }: { records: GrowthRecord[] }) {
           {hasHeight && (
             <>
               <line x1="0" y1="0" x2="12" y2="0" stroke="#34d399" strokeWidth="2" />
-              <text x="16" y="4" className="fill-white/50" fontSize="10">Height</text>
+              <text x="16" y="4" className="fill-stone-500" fontSize="10">Height</text>
             </>
           )}
           {hasLeaves && records.length > 1 && (
             <>
               <line x1="0" y1="14" x2="12" y2="14" stroke="#818cf8" strokeWidth="2" strokeDasharray="4 2" />
-              <text x="16" y="18" className="fill-white/50" fontSize="10">Leaves</text>
+              <text x="16" y="18" className="fill-stone-500" fontSize="10">Leaves</text>
             </>
           )}
           {records.length === 1 && (
-            <text x="0" y="0" className="fill-white/30" fontSize="10">
+            <text x="0" y="0" className="fill-stone-400" fontSize="10">
               Add more records to see a trend
             </text>
           )}

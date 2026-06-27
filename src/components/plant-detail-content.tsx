@@ -108,14 +108,14 @@ export function PlantDetailContent({
               <span className="text-4xl">🪴</span>
             )}
             <div>
-              <h1 className="text-3xl font-bold text-white">
+              <h1 className="text-3xl font-bold text-stone-800">
                 {plant.nickname || plant.common_name}
               </h1>
               {plant.nickname && plant.common_name && (
-                <p className="text-base text-white/40 mt-0.5">{plant.common_name}</p>
+                <p className="text-base text-stone-400 mt-0.5">{plant.common_name}</p>
               )}
               {plant.scientific_name && (
-                <p className="text-lg text-white/30 italic mt-0.5">
+                <p className="text-lg text-stone-400 italic mt-0.5">
                   {plant.scientific_name}
                 </p>
               )}
@@ -133,13 +133,13 @@ export function PlantDetailContent({
               <>
                 <Link
                   href={`/plant/${plant.slug}/edit`}
-                  className="hidden sm:inline-flex glass-card rounded-xl px-4 py-2 text-sm text-white/60 hover:text-white hover:bg-white/10 transition-all"
+                  className="hidden sm:inline-flex glass-card rounded-xl px-4 py-2 text-sm text-stone-500 hover:text-stone-800 hover:bg-stone-100/80 transition-all"
                 >
                   Edit
                 </Link>
                 <Link
                   href={`/plant/${plant.slug}/edit`}
-                  className="sm:hidden rounded-xl p-2 text-white/40 hover:text-white hover:bg-white/10 transition-all"
+                  className="sm:hidden rounded-xl p-2 text-stone-400 hover:text-stone-800 hover:bg-stone-100/80 transition-all"
                   title="Edit plant"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
@@ -152,30 +152,30 @@ export function PlantDetailContent({
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
           {plant.location && (
             <div>
-              <p className="text-xs text-white/40 uppercase tracking-wider mb-1">Location</p>
-              <p className="text-sm text-white">📍 {plant.location}</p>
+              <p className="text-xs text-stone-400 uppercase tracking-wider mb-1">Location</p>
+              <p className="text-sm text-stone-700">📍 {plant.location}</p>
             </div>
           )}
           {plant.light_requirement && (
             <div>
-              <p className="text-xs text-white/40 uppercase tracking-wider mb-1">Light</p>
-              <p className="text-sm text-white">
+              <p className="text-xs text-stone-400 uppercase tracking-wider mb-1">Light</p>
+              <p className="text-sm text-stone-700">
                 ☀️ {LIGHT_REQUIREMENT_LABELS[plant.light_requirement]}
               </p>
             </div>
           )}
           {plant.adopted_at && (
             <div>
-              <p className="text-xs text-white/40 uppercase tracking-wider mb-1">Adopted</p>
-              <p className="text-sm text-white">
+              <p className="text-xs text-stone-400 uppercase tracking-wider mb-1">Adopted</p>
+              <p className="text-sm text-stone-700">
                 📅 {new Date(plant.adopted_at).toLocaleDateString()}
               </p>
             </div>
           )}
           {plant.min_temp && (
             <div>
-              <p className="text-xs text-white/40 uppercase tracking-wider mb-1">Temperature</p>
-              <p className="text-sm text-white">
+              <p className="text-xs text-stone-400 uppercase tracking-wider mb-1">Temperature</p>
+              <p className="text-sm text-stone-700">
                 🌡️ {plant.min_temp}°C{plant.max_temp ? ` - ${plant.max_temp}°C` : ''}
               </p>
             </div>
@@ -184,7 +184,7 @@ export function PlantDetailContent({
 
         {plant.notes && (
           <div className="mt-4 pt-4 border-t border-white/5">
-            <p className="text-sm text-white/50">{plant.notes}</p>
+            <p className="text-sm text-stone-500">{plant.notes}</p>
           </div>
         )}
       </div>
@@ -204,7 +204,7 @@ export function PlantDetailContent({
         </div>
         <div>
           <div className="glass-card rounded-2xl p-4">
-            <h3 className="text-xs font-medium text-white/40 uppercase tracking-wider mb-3">
+            <h3 className="text-xs font-medium text-stone-400 uppercase tracking-wider mb-3">
               Pot Sticker QR
             </h3>
             <QRCode slug={plant.slug} plantName={plant.nickname || plant.common_name} compact={false} />
@@ -216,11 +216,11 @@ export function PlantDetailContent({
         {/* Care Schedule */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-white">Care Schedule</h2>
+            <h2 className="text-lg font-semibold text-stone-800">Care Schedule</h2>
             {careTasks.length > 0 && (
               <Link
                 href={`/care/calendar?plant=${plant.slug}`}
-                className="glass-card rounded-xl px-3 py-1.5 text-xs font-medium text-white/60 hover:text-white hover:bg-white/10 transition-all flex items-center gap-1.5"
+                className="glass-card rounded-xl px-3 py-1.5 text-xs font-medium text-stone-500 hover:text-stone-800 hover:bg-stone-100/80 transition-all flex items-center gap-1.5"
               >
                 📅 Calendar
               </Link>
@@ -228,11 +228,11 @@ export function PlantDetailContent({
           </div>
           {careTasks.length === 0 ? (
             <div className="glass-card rounded-2xl p-6 text-center">
-              <p className="text-white/30 text-sm mb-4">No care tasks configured yet.</p>
+              <p className="text-stone-400 text-sm mb-4">No care tasks configured yet.</p>
               {isOwner && (
                 <Link
                   href={`/plant/${plant.slug}/edit`}
-                  className="text-emerald-400 text-sm hover:text-emerald-300 transition-colors"
+                  className="text-emerald-600 text-sm hover:text-emerald-500 transition-colors"
                 >
                   Configure care tasks
                 </Link>
@@ -266,10 +266,10 @@ export function PlantDetailContent({
                           {TASK_TYPE_ICONS[task.task_type as TaskType]}
                         </span>
                         <div>
-                          <p className="text-sm font-medium text-white">
+                          <p className="text-sm font-medium text-stone-800">
                             {TASK_TYPE_LABELS[task.task_type as TaskType]}
                           </p>
-                          <p className="text-xs text-white/40">
+                          <p className="text-xs text-stone-400">
                             {task.frequency_days
                               ? `Every ${task.frequency_days} day${task.frequency_days !== 1 ? 's' : ''}`
                               : 'As needed'}
@@ -280,19 +280,19 @@ export function PlantDetailContent({
 
                       <div className="flex items-center gap-3">
                         {lastLog && (
-                          <span className="text-xs text-white/30">
+                          <span className="text-xs text-stone-400">
                             {daysSinceLast}d ago
                           </span>
                         )}
                         {isOverdue && (
-                          <span className="text-xs font-medium text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full">
+                          <span className="text-xs font-medium text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full">
                             Due
                           </span>
                         )}
                         <button
                           onClick={() => handleLogCare(task.id, task.task_type as TaskType)}
                           disabled={loggingTask === task.id}
-                          className="rounded-lg bg-emerald-500/20 px-3 py-1.5 text-xs font-medium text-emerald-300 hover:bg-emerald-500/30 disabled:opacity-50 transition-all"
+                          className="rounded-lg bg-emerald-100 px-3 py-1.5 text-xs font-medium text-emerald-700 hover:bg-emerald-200 disabled:opacity-50 transition-all"
                         >
                           {loggingTask === task.id ? '...' : 'Done'}
                         </button>
@@ -300,7 +300,7 @@ export function PlantDetailContent({
                     </div>
 
                     {task.notes && (
-                      <p className="text-xs text-white/30 mt-2 ml-9">{task.notes}</p>
+                      <p className="text-xs text-stone-400 mt-2 ml-9">{task.notes}</p>
                     )}
                   </div>
                 );
@@ -311,15 +311,15 @@ export function PlantDetailContent({
           {/* Recent care logs for this plant */}
           {careLogs.length > 0 && (
             <div className="mt-6">
-              <h3 className="text-sm font-medium text-white/50 mb-3">Recent Logs</h3>
+              <h3 className="text-sm font-medium text-stone-500 mb-3">Recent Logs</h3>
               <div className="space-y-1.5">
                 {careLogs.slice(0, 10).map((log) => (
                   <div
                     key={log.id}
-                    className="flex items-center gap-2 text-xs text-white/30"
+                    className="flex items-center gap-2 text-xs text-stone-400"
                   >
                     <span>{TASK_TYPE_ICONS[log.task_type as TaskType]}</span>
-                    <span className="text-white/50">
+                    <span className="text-stone-500">
                       {TASK_TYPE_LABELS[log.task_type as TaskType]}
                     </span>
                     <span>·</span>
@@ -334,7 +334,7 @@ export function PlantDetailContent({
 
         {/* Journal */}
         <div id="journal">
-          <h2 className="text-lg font-semibold text-white mb-4">Journal</h2>
+          <h2 className="text-lg font-semibold text-stone-800 mb-4">Journal</h2>
 
           <div className="glass-card rounded-2xl p-4 mb-4">
             <textarea
@@ -342,7 +342,7 @@ export function PlantDetailContent({
               onChange={(e) => setJournalText(e.target.value)}
               placeholder="Write a journal entry about this plant..."
               rows={3}
-              className="w-full bg-transparent text-sm text-white placeholder:text-white/30 focus:outline-none resize-none"
+              className="w-full bg-transparent text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none resize-none"
             />
             <div className="flex justify-end mt-2">
               <button
@@ -357,14 +357,14 @@ export function PlantDetailContent({
 
           {journalEntries.length === 0 ? (
             <div className="glass-card rounded-2xl p-6 text-center">
-              <p className="text-white/30 text-sm">No journal entries yet.</p>
+              <p className="text-stone-400 text-sm">No journal entries yet.</p>
             </div>
           ) : (
             <div className="space-y-2">
               {journalEntries.map((entry) => (
                 <div key={entry.id} className="glass-card rounded-xl p-4">
-                  <p className="text-sm text-white/80">{entry.content}</p>
-                  <p className="text-xs text-white/30 mt-2">
+                  <p className="text-sm text-stone-700">{entry.content}</p>
+                  <p className="text-xs text-stone-400 mt-2">
                     {new Date(entry.created_at).toLocaleDateString(undefined, {
                       month: 'short',
                       day: 'numeric',

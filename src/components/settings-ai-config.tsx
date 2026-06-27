@@ -135,7 +135,7 @@ export function SettingsAiConfig() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-5 w-5 animate-spin text-white/40" />
+        <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
       </div>
     );
   }
@@ -146,13 +146,13 @@ export function SettingsAiConfig() {
     <div>
       <div className="flex items-center gap-3 mb-6">
         <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${
-          isConfigured ? 'bg-emerald-500/15' : 'bg-white/5'
+          isConfigured ? 'bg-emerald-100' : 'bg-stone-100/50'
         }`}>
-          <Sparkles className={`h-5 w-5 ${isConfigured ? 'text-emerald-400' : 'text-white/30'}`} />
+          <Sparkles className={`h-5 w-5 ${isConfigured ? 'text-emerald-600' : 'text-stone-400'}`} />
         </div>
         <div>
-          <h2 className="text-lg font-semibold text-white">AI Provider</h2>
-          <p className="text-xs text-white/40">
+          <h2 className="text-lg font-semibold text-stone-800">AI Provider</h2>
+          <p className="text-xs text-stone-400">
             {isConfigured
               ? `Using your ${status!.provider} account (${status!.model})`
               : 'Using the default AI provider. Configure your own for higher limits.'}
@@ -161,14 +161,14 @@ export function SettingsAiConfig() {
       </div>
 
       {success && (
-        <div className="flex items-center gap-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-3 mb-4 text-sm text-emerald-300">
+        <div className="flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200/50 px-4 py-3 mb-4 text-sm text-emerald-700">
           <CheckCircle2 className="h-4 w-4 shrink-0" />
           {success}
         </div>
       )}
 
       {error && (
-        <div className="flex items-start gap-2 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 mb-4 text-sm text-red-400">
+        <div className="flex items-start gap-2 rounded-xl bg-red-50 border border-red-200/50 px-4 py-3 mb-4 text-sm text-red-600">
           <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
           <p>{error}</p>
         </div>
@@ -177,14 +177,14 @@ export function SettingsAiConfig() {
       <form onSubmit={handleSave} className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1.5">Provider</label>
+            <label className="block text-sm font-medium text-stone-600 mb-1.5">Provider</label>
             <select
               value={provider}
               onChange={(e) => handleProviderChange(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
+              className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
             >
               {PROVIDERS.map((p) => (
-                <option key={p.id} value={p.id} className="bg-[#0a1f1a]">
+                <option key={p.id} value={p.id} className="bg-white">
                   {p.name}
                 </option>
               ))}
@@ -192,19 +192,19 @@ export function SettingsAiConfig() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1.5">Model</label>
+            <label className="block text-sm font-medium text-stone-600 mb-1.5">Model</label>
             <input
               type="text"
               value={model}
               onChange={(e) => setModel(e.target.value)}
               placeholder={PROVIDERS.find((p) => p.id === provider)?.defaultModel || 'Model name'}
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
+              className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-white/70 mb-1.5">API Key</label>
+          <label className="block text-sm font-medium text-stone-600 mb-1.5">API Key</label>
           <div className="relative">
             <input
               type={showKey ? 'text' : 'password'}
@@ -216,7 +216,7 @@ export function SettingsAiConfig() {
             <button
               type="button"
               onClick={() => setShowKey(!showKey)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 transition-colors"
             >
               {showKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
@@ -224,15 +224,15 @@ export function SettingsAiConfig() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-white/70 mb-1.5">
-            Base URL <span className="text-white/30 font-normal">(optional — for custom endpoints)</span>
+          <label className="block text-sm font-medium text-stone-600 mb-1.5">
+            Base URL <span className="text-stone-400 font-normal">(optional — for custom endpoints)</span>
           </label>
           <input
             type="text"
             value={baseUrl}
             onChange={(e) => setBaseUrl(e.target.value)}
             placeholder="https://api.example.com/v1/chat/completions"
-            className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
+            className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
           />
         </div>
 
@@ -240,10 +240,10 @@ export function SettingsAiConfig() {
         {testResult && (
           <div className={`rounded-xl px-4 py-3 text-sm ${
             testResult.startsWith('✅')
-              ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-300'
+              ? 'bg-emerald-50 border border-emerald-200/50 text-emerald-700'
               : testResult.startsWith('❌')
-              ? 'bg-red-500/10 border border-red-500/20 text-red-400'
-              : 'bg-amber-500/10 border border-amber-500/20 text-amber-300'
+              ? 'bg-red-50 border border-red-200/50 text-red-600'
+              : 'bg-amber-50 border border-amber-200/50 text-amber-700'
           }`}>
             {testResult}
           </div>
@@ -254,7 +254,7 @@ export function SettingsAiConfig() {
             type="button"
             onClick={handleTest}
             disabled={testing || !apiKey}
-            className="rounded-xl border border-white/10 px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 disabled:opacity-50 transition-all flex items-center gap-1.5"
+            className="rounded-xl border border-stone-200/50 px-4 py-2.5 text-sm text-stone-500 hover:text-stone-800 hover:bg-stone-100/50 disabled:opacity-50 transition-all flex items-center gap-1.5"
           >
             {testing ? (
               <>
@@ -272,7 +272,7 @@ export function SettingsAiConfig() {
           <button
             type="submit"
             disabled={saving || !apiKey}
-            className="rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
+            className="rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
           >
             {saving ? (
               <span className="flex items-center gap-2">
@@ -290,7 +290,7 @@ export function SettingsAiConfig() {
             <button
               type="button"
               onClick={() => setShowDeleteConfirm(true)}
-              className="rounded-xl border border-red-500/30 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-all flex items-center gap-1.5"
+              className="rounded-xl border border-red-300/50 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-all flex items-center gap-1.5"
             >
               <Trash2 className="h-4 w-4" />
               Remove
@@ -300,8 +300,8 @@ export function SettingsAiConfig() {
       </form>
 
       {showDeleteConfirm && (
-        <div className="mt-4 rounded-xl bg-red-500/10 border border-red-500/20 p-4">
-          <p className="text-sm text-red-300 mb-3">
+        <div className="mt-4 rounded-xl bg-red-50 border border-red-200/50 p-4">
+          <p className="text-sm text-red-700 mb-3">
             Remove your AI configuration? The app will fall back to the default provider.
           </p>
           <div className="flex gap-2">
@@ -314,7 +314,7 @@ export function SettingsAiConfig() {
             </button>
             <button
               onClick={() => setShowDeleteConfirm(false)}
-              className="rounded-lg border border-white/10 px-4 py-2 text-xs text-white/50 hover:text-white hover:bg-white/5 transition-all"
+              className="rounded-lg border border-stone-200/50 px-4 py-2 text-xs text-stone-500 hover:text-stone-800 hover:bg-stone-100/50 transition-all"
             >
               Cancel
             </button>

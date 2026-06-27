@@ -59,14 +59,14 @@ export function DashboardContent({ plants, careLogs, careTasks, primaryPhotoMap 
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white">Dashboard</h1>
-          <p className="mt-1 text-white/50">
+          <h1 className="text-3xl font-bold text-stone-800">Dashboard</h1>
+          <p className="mt-1 text-stone-500">
             {totalPlants} plant{totalPlants !== 1 ? 's' : ''} · {activeTasks} active care task{activeTasks !== 1 ? 's' : ''}
           </p>
         </div>
         <Link
           href="/plants/new"
-          className="glass-card rounded-xl px-4 py-2.5 text-sm font-medium text-white hover:bg-white/10 transition-all active:scale-[0.98] flex items-center gap-2"
+          className="glass-card rounded-xl px-4 py-2.5 text-sm font-medium text-stone-700 hover:bg-stone-100/80 transition-all active:scale-[0.98] flex items-center gap-2"
         >
           <span className="text-lg">+</span>
           Add Plant
@@ -76,35 +76,35 @@ export function DashboardContent({ plants, careLogs, careTasks, primaryPhotoMap 
       {/* Stats row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="glass-card rounded-2xl p-4">
-          <p className="text-2xl font-bold text-white">{totalPlants}</p>
-          <p className="text-xs text-white/50 mt-1">Total Plants</p>
+          <p className="text-2xl font-bold text-stone-800">{totalPlants}</p>
+          <p className="text-xs text-stone-500 mt-1">Total Plants</p>
         </div>
         <div className="glass-card rounded-2xl p-4">
-          <p className="text-2xl font-bold text-emerald-400">{activeTasks}</p>
-          <p className="text-xs text-white/50 mt-1">Active Tasks</p>
+          <p className="text-2xl font-bold text-emerald-600">{activeTasks}</p>
+          <p className="text-xs text-stone-500 mt-1">Active Tasks</p>
         </div>
         <div className="glass-card rounded-2xl p-4">
-          <p className="text-2xl font-bold text-amber-400">
+          <p className="text-2xl font-bold text-amber-600">
             {upcomingTasks.filter((t) => t.isOverdue).length}
           </p>
-          <p className="text-xs text-white/50 mt-1">Overdue</p>
+          <p className="text-xs text-stone-500 mt-1">Overdue</p>
         </div>
         <div className="glass-card rounded-2xl p-4">
-          <p className="text-2xl font-bold text-white">{careLogs.length}</p>
-          <p className="text-xs text-white/50 mt-1">Care Logs</p>
+          <p className="text-2xl font-bold text-stone-800">{careLogs.length}</p>
+          <p className="text-xs text-stone-500 mt-1">Care Logs</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Upcoming care tasks */}
         <div>
-          <h2 className="text-lg font-semibold text-white mb-4">Upcoming Care</h2>
+          <h2 className="text-lg font-semibold text-stone-800 mb-4">Upcoming Care</h2>
           {upcomingTasks.length === 0 ? (
             <div className="glass-card rounded-2xl p-6 text-center">
-              <p className="text-white/30 text-sm">No care tasks configured yet.</p>
+              <p className="text-stone-400 text-sm">No care tasks configured yet.</p>
               <Link
                 href="/plants/new"
-                className="text-emerald-400 text-sm hover:text-emerald-300 mt-2 inline-block transition-colors"
+                className="text-emerald-600 text-sm hover:text-emerald-500 mt-2 inline-block transition-colors"
               >
                 Add your first plant
               </Link>
@@ -115,23 +115,23 @@ export function DashboardContent({ plants, careLogs, careTasks, primaryPhotoMap 
                 <Link
                   key={`${task.id}-${task.plant?.slug}`}
                   href={`/plant/${task.plant?.slug}`}
-                  className={`glass-card rounded-xl p-4 flex items-center gap-3 transition-all hover:bg-white/[0.08] ${
+                  className={`glass-card rounded-xl p-4 flex items-center gap-3 transition-all hover:bg-stone-100/50 ${
                     task.isOverdue ? 'border-amber-500/20' : ''
                   }`}
                 >
                   <span className="text-xl">{TASK_TYPE_ICONS[task.task_type as TaskType]}</span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white truncate">
+                    <p className="text-sm font-medium text-stone-800 truncate">
                       {TASK_TYPE_LABELS[task.task_type as TaskType]}
                     </p>
-                    <p className="text-xs text-white/40 truncate">
+                    <p className="text-xs text-stone-400 truncate">
                       {task.plant?.nickname || task.plant?.common_name}
                       {task.daysSinceLastDone !== null &&
                         ` · ${task.daysSinceLastDone}d since last`}
                     </p>
                   </div>
                   {task.isOverdue && (
-                    <span className="text-xs font-medium text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full">
+                    <span className="text-xs font-medium text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full">
                       Overdue
                     </span>
                   )}
@@ -143,10 +143,10 @@ export function DashboardContent({ plants, careLogs, careTasks, primaryPhotoMap 
 
         {/* Recent activity */}
         <div>
-          <h2 className="text-lg font-semibold text-white mb-4">Recent Activity</h2>
+          <h2 className="text-lg font-semibold text-stone-800 mb-4">Recent Activity</h2>
           {recentActivity.length === 0 ? (
             <div className="glass-card rounded-2xl p-6 text-center">
-              <p className="text-white/30 text-sm">No care logged yet.</p>
+              <p className="text-stone-400 text-sm">No care logged yet.</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -162,20 +162,20 @@ export function DashboardContent({ plants, careLogs, careTasks, primaryPhotoMap 
                       {TASK_TYPE_ICONS[log.task_type as TaskType]}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-white">
+                      <p className="text-sm text-stone-700">
                         <span className="font-medium">
                           {TASK_TYPE_LABELS[log.task_type as TaskType]}
                         </span>
-                        <span className="text-white/40"> on </span>
-                        <span className="text-emerald-300">
+                        <span className="text-stone-400"> on </span>
+                        <span className="text-emerald-600">
                           {logPlant?.nickname || logPlant?.common_name || 'Unknown plant'}
                         </span>
                       </p>
                       {log.notes && (
-                        <p className="text-xs text-white/30 mt-0.5 truncate">{log.notes}</p>
+                        <p className="text-xs text-stone-400 mt-0.5 truncate">{log.notes}</p>
                       )}
                     </div>
-                    <span className="text-xs text-white/30 whitespace-nowrap">{timeAgo}</span>
+                    <span className="text-xs text-stone-400 whitespace-nowrap">{timeAgo}</span>
                   </div>
                 );
               })}
@@ -186,17 +186,17 @@ export function DashboardContent({ plants, careLogs, careTasks, primaryPhotoMap 
 
       {/* Plant grid */}
       <div>
-        <h2 className="text-lg font-semibold text-white mb-4">Your Plants</h2>
+        <h2 className="text-lg font-semibold text-stone-800 mb-4">Your Plants</h2>
         {plants.length === 0 ? (
           <div className="glass-card rounded-2xl p-12 text-center">
             <span className="text-5xl mb-4 block">🪴</span>
-            <h3 className="text-xl font-semibold text-white mb-2">No plants yet</h3>
-            <p className="text-white/40 text-sm mb-6">
+            <h3 className="text-xl font-semibold text-stone-700 mb-2">No plants yet</h3>
+            <p className="text-stone-400 text-sm mb-6">
               Add your first plant to start tracking its care.
             </p>
             <Link
               href="/plants/new"
-              className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 hover:bg-emerald-400 transition-all"
+              className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 hover:bg-emerald-400 transition-all"
             >
               <span>+</span>
               Add your first plant

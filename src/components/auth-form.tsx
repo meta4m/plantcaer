@@ -62,13 +62,13 @@ export function AuthForm({ mode, redirectTo }: AuthFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div className="rounded-lg bg-red-900 border border-red-500 px-4 py-3 text-sm text-red-200 font-medium">
+        <div className="rounded-lg bg-red-50 border border-red-300 px-4 py-3 text-sm text-red-600 font-medium">
           {error}
         </div>
       )}
 
       <div>
-        <label htmlFor="email" className="block text-sm font-semibold text-white mb-1.5">
+        <label htmlFor="email" className="block text-sm font-semibold text-stone-700 mb-1.5">
           Email
         </label>
         <input
@@ -78,12 +78,12 @@ export function AuthForm({ mode, redirectTo }: AuthFormProps) {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
           required
-          className="w-full rounded-xl border border-white/30 bg-white/15 px-4 py-2.5 text-sm text-white placeholder:text-white/45 focus:border-emerald-400 focus:outline-none focus:ring-[3px] focus:ring-emerald-400/35 transition-all"
+          className="w-full rounded-xl border border-stone-300/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500 focus:outline-none focus:ring-[3px] focus:ring-emerald-500/20 transition-all"
         />
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-sm font-semibold text-white mb-1.5">
+        <label htmlFor="password" className="block text-sm font-semibold text-stone-700 mb-1.5">
           Password
         </label>
         <input
@@ -92,14 +92,14 @@ export function AuthForm({ mode, redirectTo }: AuthFormProps) {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="optional"
-          className="w-full rounded-xl border border-white/30 bg-white/15 px-4 py-2.5 text-sm text-white placeholder:text-white/45 focus:border-emerald-400 focus:outline-none focus:ring-[3px] focus:ring-emerald-400/35 transition-all"
+          className="w-full rounded-xl border border-stone-300/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500 focus:outline-none focus:ring-[3px] focus:ring-emerald-500/20 transition-all"
         />
       </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/30 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] cursor-pointer border-0"
+        className="w-full rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] cursor-pointer border-0"
       >
         {loading ? (
           <span className="flex items-center justify-center gap-2">
@@ -111,20 +111,18 @@ export function AuthForm({ mode, redirectTo }: AuthFormProps) {
         ) : (
           'Create account'
         )}
-      </button>
-
-      <p className="text-center text-sm text-white/50">
+      </button>          <p className="text-center text-sm text-stone-500">
         {mode === 'login' ? (
           <>
             Don&apos;t have an account?{' '}
-            <a href="/auth/signup" className="text-emerald-400 hover:text-emerald-300 transition-colors font-medium">
+            <a href="/auth/signup" className="text-emerald-600 hover:text-emerald-500 transition-colors font-medium">
               Sign up
             </a>
           </>
         ) : (
           <>
             Already have an account?{' '}
-            <a href="/auth/login" className="text-emerald-400 hover:text-emerald-300 transition-colors font-medium">
+            <a href="/auth/login" className="text-emerald-600 hover:text-emerald-500 transition-colors font-medium">
               Sign in
             </a>
           </>
