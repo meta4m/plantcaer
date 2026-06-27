@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback, useMemo } from 'react';
+import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -182,6 +182,16 @@ export function PlantCareCalendar({ events, plants }: PlantCareCalendarProps) {
       return { ...prev, eventIndex: Math.min(modalEvents.length - 1, prev.eventIndex + 1) };
     });
   };
+
+  // ESC key to dismiss modal
+  useEffect(() => {
+    if (!modalState) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setModalState(null);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [modalState]);
 
   // Navigate to adjacent days that have events
   const goToPrevDay = () => {
@@ -394,13 +404,22 @@ export function PlantCareCalendar({ events, plants }: PlantCareCalendarProps) {
       {/* Day/Event detail modal */}
       {modalState && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
           onClick={() => setModalState(null)}
         >
           <div
-            className="glass-card rounded-2xl p-6 max-w-sm w-full"
+            className="glass-card rounded-2xl p-6 pt-10 max-w-sm w-full relative"
             onClick={(e) => e.stopPropagation()}
           >
+            {/* Close button — top-right corner */}
+            <button
+              onClick={() => setModalState(null)}
+              className="absolute top-3 right-3 rounded-full bg-white/10 p-1.5 text-white/60 hover:text-white hover:bg-white/20 transition-all z-10"
+              title="Close (ESC)"
+            >
+              <X className="h-4 w-4" />
+            </button>
+
             {/* Day navigation header */}
             <div className="flex items-center justify-between mb-4">
               <button
@@ -463,30 +482,22 @@ export function PlantCareCalendar({ events, plants }: PlantCareCalendarProps) {
                   </div>
                 )}
 
-                {/* Event details */}
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">
-                      {TASK_TYPE_ICONS[selectedEvent.extendedProps.taskType]}
-                    </span>
-                    <div>
-                      <h3 className="text-lg font-semibold text-white">
-                        {selectedEvent.title}
-                      </h3>
-                      <Link
-                        href={`/plant/${selectedEvent.extendedProps.plantSlug}`}
-                        className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
-                      >
-                        {selectedEvent.extendedProps.plantName}
-                      </Link>
-                    </div>
+                {/* Event details — no inline X button, it's in the top-right */}
+                <div className="flex items-start gap-3 mb-3">
+                  <span className="text-2xl shrink-0">
+                    {TASK_TYPE_ICONS[selectedEvent.extendedProps.taskType]}
+                  </span>
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">
+                      {selectedEvent.title}
+                    </h3>
+                    <Link
+                      href={`/plant/${selectedEvent.extendedProps.plantSlug}`}
+                      className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
+                    >
+                      {selectedEvent.extendedProps.plantName}
+                    </Link>
                   </div>
-                  <button
-                    onClick={() => setModalState(null)}
-                    className="rounded-full bg-white/10 p-1.5 text-white/60 hover:text-white hover:bg-white/20 transition-all"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
                 </div>
 
                 <div className="space-y-2 mb-4">

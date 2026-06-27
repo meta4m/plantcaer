@@ -54,23 +54,21 @@ export function CareView({
 
   return (
     <div className="space-y-6">
-      {/* View toggle header */}
+      {/* View toggle header — title is handled by CareContent or calendar */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white">
-            {filteredPlant
-              ? `${filteredPlant.nickname || filteredPlant.common_name} — Care`
-              : 'Care'}
-          </h1>
-          <p className="mt-1 text-white/50">
-            {!hasPlants ? (
-              'No plants yet'
-            ) : view === 'calendar' ? (
-              `${calendarEvents.length} event${calendarEvents.length !== 1 ? 's' : ''}`
-            ) : (
-              `${taskCount} active task${taskCount !== 1 ? 's' : ''}`
-            )}
-          </p>
+          {view === 'calendar' && (
+            <>
+              <h1 className="text-3xl font-bold text-white">
+                {filteredPlant
+                  ? `${filteredPlant.nickname || filteredPlant.common_name} — Care`
+                  : 'Care Calendar'}
+              </h1>
+              <p className="mt-1 text-white/50">
+                {calendarEvents.length} event{calendarEvents.length !== 1 ? 's' : ''}
+              </p>
+            </>
+          )}
         </div>
 
         <div className="flex items-center gap-2">
