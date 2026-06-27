@@ -43,7 +43,6 @@ export function Navbar() {
     { href: '/', label: 'Dashboard' },
     { href: '/plants', label: 'Plants' },
     { href: '/care', label: 'Care' },
-    { href: '/care/calendar', label: 'Calendar' },
     { href: '/plants/qr-print', label: 'Stickers' },
   ];
 
