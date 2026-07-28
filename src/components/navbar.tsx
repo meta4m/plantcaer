@@ -78,7 +78,7 @@ export function Navbar() {
               <div className="relative">
                 <button
                   onClick={() => setMenuOpen(!menuOpen)}
-                  className="flex items-center gap-2 rounded-lg border border-stone-200/50 bg-amber-50/50 px-3 py-1.5 text-sm text-stone-600 hover:text-stone-800 hover:bg-stone-100/80 transition-all"
+                  className="flex min-h-[44px] items-center gap-2 rounded-lg border border-stone-200/50 bg-amber-50/50 px-3 py-1.5 text-sm text-stone-600 hover:text-stone-800 hover:bg-stone-100/80 transition-all"
                 >
                   <span className="h-6 w-6 rounded-full bg-[var(--color-forest)]/15 flex items-center justify-center text-xs text-[var(--color-forest)]">
                     {user.email?.[0]?.toUpperCase() || '?'}

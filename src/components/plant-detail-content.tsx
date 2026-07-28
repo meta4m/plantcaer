@@ -380,7 +380,7 @@ export function PlantDetailContent({
               <button
                 onClick={handleAddJournalEntry}
                 disabled={!journalText.trim() || savingJournal}
-                className="rounded-xl bg-[var(--color-forest)] px-4 py-2 text-xs font-medium text-white hover:bg-[var(--color-forest-hover)] disabled:opacity-50 transition-all"
+                className="rounded-xl bg-[var(--color-forest)] px-4 py-2 min-h-[44px] text-xs font-medium text-white hover:bg-[var(--color-forest-hover)] disabled:opacity-50 transition-all"
               >
                 {savingJournal ? 'Saving...' : 'Add Entry'}
               </button>
@@ -388,7 +388,14 @@ export function PlantDetailContent({
           </div>
 
           {journalEntries.length === 0 ? (
-            <div className="glass-card rounded-2xl p-6 text-center">
+            <div className="glass-card rounded-2xl p-8 text-center">
+              <img
+                src="/illustrations/empty-journal.webp"
+                alt=""
+                width={140}
+                height={140}
+                className="mx-auto mb-3"
+              />
               <p className="text-stone-400 text-sm">No journal entries yet.</p>
             </div>
           ) : (

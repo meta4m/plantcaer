@@ -133,7 +133,8 @@ export function AiSuggestionOverlay({
           </div>
           <button
             onClick={onDismiss}
-            className="rounded-full bg-stone-100/50 p-1.5 text-stone-500 hover:text-stone-800 hover:bg-stone-200/50 transition-all"
+            aria-label="Dismiss"
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-stone-100/50 text-stone-500 hover:text-stone-800 hover:bg-stone-200/50 transition-all"
           >
             <X className="h-4 w-4" />
           </button>

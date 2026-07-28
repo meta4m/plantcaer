@@ -240,7 +240,13 @@ export function DashboardContent({ plants, careLogs, careTasks, primaryPhotoMap 
         <h2 className="text-lg font-semibold text-stone-800 mb-4">Your Plants</h2>
         {plants.length === 0 ? (
           <div className="glass-card rounded-2xl p-12 text-center">
-            <UI_ICONS.plants size={48} className="mx-auto mb-4 text-stone-300" aria-hidden="true" />
+            <img
+              src="/illustrations/empty-plants.webp"
+              alt=""
+              width={160}
+              height={160}
+              className="mx-auto mb-4"
+            />
             <h3 className="text-xl font-semibold text-stone-700 mb-2">No plants yet</h3>
             <p className="text-stone-400 text-sm mb-6">
               Add your first plant to start tracking its care.

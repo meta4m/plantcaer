@@ -415,7 +415,7 @@ export function PlantCareCalendar({ events, plants }: PlantCareCalendarProps) {
             {/* Close button — top-right corner */}
             <button
               onClick={() => setModalState(null)}
-              className="absolute top-3 right-3 rounded-full bg-white/10 p-1.5 text-white/60 hover:text-white hover:bg-white/20 transition-all z-10"
+              className="absolute top-3 right-3 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white/60 hover:text-white hover:bg-white/20 transition-all z-10"
               title="Close (ESC)"
             >
               <X className="h-4 w-4" />
@@ -426,7 +426,7 @@ export function PlantCareCalendar({ events, plants }: PlantCareCalendarProps) {
               <button
                 onClick={goToPrevDay}
                 disabled={!hasPrevDay}
-                className="rounded-full bg-white/10 p-1.5 text-white/60 hover:text-white hover:bg-white/20 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white/60 hover:text-white hover:bg-white/20 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                 title="Previous day with events"
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -445,7 +445,7 @@ export function PlantCareCalendar({ events, plants }: PlantCareCalendarProps) {
               <button
                 onClick={goToNextDay}
                 disabled={!hasNextDay}
-                className="rounded-full bg-white/10 p-1.5 text-white/60 hover:text-white hover:bg-white/20 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white/60 hover:text-white hover:bg-white/20 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                 title="Next day with events"
               >
                 <ChevronRight className="h-4 w-4" />
@@ -466,7 +466,7 @@ export function PlantCareCalendar({ events, plants }: PlantCareCalendarProps) {
                     <button
                       onClick={goToPrevEvent}
                       disabled={modalState.eventIndex <= 0}
-                      className="rounded-lg bg-white/10 p-1 text-white/60 hover:text-white hover:bg-white/20 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                      className="flex h-11 w-11 items-center justify-center rounded-lg bg-white/10 text-white/60 hover:text-white hover:bg-white/20 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                     >
                       <ChevronLeft className="h-3.5 w-3.5" />
                     </button>
@@ -476,7 +476,7 @@ export function PlantCareCalendar({ events, plants }: PlantCareCalendarProps) {
                     <button
                       onClick={goToNextEvent}
                       disabled={modalState.eventIndex >= modalEvents.length - 1}
-                      className="rounded-lg bg-white/10 p-1 text-white/60 hover:text-white hover:bg-white/20 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                      className="flex h-11 w-11 items-center justify-center rounded-lg bg-white/10 text-white/60 hover:text-white hover:bg-white/20 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                     >
                       <ChevronRight className="h-3.5 w-3.5" />
                     </button>

@@ -141,7 +141,13 @@ export function CareContent({ plants, careTasks, careLogs, primaryPhotoMap = {} 
 
       {tasksWithPlants.length === 0 && plants.length === 0 ? (
         <div className="glass-card rounded-2xl p-12 text-center">
-          <UI_ICONS.plants size={48} className="mx-auto mb-4 text-stone-300" aria-hidden="true" />
+          <img
+            src="/illustrations/empty-plants.webp"
+            alt=""
+            width={160}
+            height={160}
+            className="mx-auto mb-4"
+          />
           <h3 className="text-xl font-semibold text-stone-700 mb-2">No plants yet</h3>
           <p className="text-stone-400 text-sm mb-6">
             Add a plant first, then configure its care schedule.
@@ -155,7 +161,13 @@ export function CareContent({ plants, careTasks, careLogs, primaryPhotoMap = {} 
         </div>
       ) : tasksWithPlants.length === 0 ? (
         <div className="glass-card rounded-2xl p-12 text-center">
-          <UI_ICONS.clipboard size={48} className="mx-auto mb-4 text-stone-300" aria-hidden="true" />
+          <img
+            src="/illustrations/empty-care.webp"
+            alt=""
+            width={160}
+            height={160}
+            className="mx-auto mb-4"
+          />
           <h3 className="text-xl font-semibold text-stone-700 mb-2">No care tasks yet</h3>
           <p className="text-stone-400 text-sm mb-6">
             Configure care schedules for your plants to see them here.

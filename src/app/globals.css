@@ -54,6 +54,15 @@
 }
 
 /* ==========================================
+   TOUCH TARGETS — WCAG 2.5.8 minimum 44px
+   Applies to all form fields app-wide.
+   ========================================== */
+input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']):not([type='hidden']),
+select {
+  min-height: 44px;
+}
+
+/* ==========================================
    AUTOFILL OVERRIDE
    ========================================== */
 input:-webkit-autofill,
