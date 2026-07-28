@@ -268,33 +268,37 @@ export function PlantCareCalendar({ events, plants }: PlantCareCalendarProps) {
   return (
     <div>
       {/* Custom toolbar with full date */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-center gap-2">
           <button
             onClick={goPrev}
-            className="glass-card rounded-xl p-1.5 text-stone-500 hover:text-stone-800 hover:bg-stone-100/80 transition-all"
+            className="glass-card flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-stone-500 hover:text-stone-800 hover:bg-stone-100/80 transition-all"
             title="Previous month"
+            aria-label="Previous month"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
           <button
             onClick={goToday}
-            className="glass-card rounded-xl px-3 py-1.5 text-xs font-medium text-stone-500 hover:text-stone-800 hover:bg-stone-100/80 transition-all"
+            className="glass-card min-h-11 shrink-0 rounded-xl px-3 py-1.5 text-xs font-medium text-stone-500 hover:text-stone-800 hover:bg-stone-100/80 transition-all"
           >
             Today
           </button>
           <button
             onClick={goNext}
-            className="glass-card rounded-xl p-1.5 text-stone-500 hover:text-stone-800 hover:bg-stone-100/80 transition-all"
+            className="glass-card flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-stone-500 hover:text-stone-800 hover:bg-stone-100/80 transition-all"
             title="Next month"
+            aria-label="Next month"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
-          <h2 className="text-lg font-semibold text-stone-800 ml-2">{currentTitle}</h2>
+          <h2 className="ml-1 min-w-0 truncate text-base font-semibold text-stone-800 sm:ml-2 sm:text-lg">
+            {currentTitle}
+          </h2>
         </div>
 
         {/* Legend */}
-        <div className="flex items-center gap-3 text-[11px] text-stone-400">
+        <div className="flex items-center gap-4 text-xs text-stone-500 sm:gap-3 sm:text-[11px] sm:text-stone-400">
           <div className="flex items-center gap-1">
             <span className="h-2 w-2 rounded-full" style={{ backgroundColor: TASK_COLORS.watering }} />
             Due
@@ -388,10 +392,10 @@ export function PlantCareCalendar({ events, plants }: PlantCareCalendarProps) {
                 <span
                   className={`text-sm ${
                     isToday
-                      ? 'bg-emerald-500 text-white font-bold rounded-full h-7 w-7 flex items-center justify-center mx-auto'
+                      ? 'bg-[var(--color-forest)] text-white font-bold rounded-full h-7 w-7 flex items-center justify-center mx-auto'
                       : isOtherMonth
-                      ? 'text-white/20'
-                      : 'text-white/60'
+                      ? 'text-stone-300'
+                      : 'text-stone-600'
                   }`}
                 >
                   {info.dayNumberText}

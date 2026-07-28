@@ -20,14 +20,14 @@ export function QRPrintContent({ plants }: QRPrintContentProps) {
     <div className="space-y-6">
       <div className="flex items-center justify-between no-print">
         <div>
-          <h1 className="text-3xl font-bold text-white">QR Pot Stickers</h1>
-          <p className="mt-1 text-white/50">
+           <h1 className="text-2xl font-bold text-stone-800 sm:text-3xl">QR Pot Stickers</h1>
+           <p className="mt-1 text-stone-500">
             {plants.length} sticker{plants.length !== 1 ? 's' : ''}
           </p>
         </div>
         <button
           onClick={() => window.print()}
-          className="glass-card rounded-xl px-4 py-2.5 text-sm font-medium text-white hover:bg-white/10 transition-all flex items-center gap-2"
+          className="glass-card flex min-h-[44px] items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-stone-700 hover:bg-stone-100/80 transition-all"
         >
           <Printer className="h-4 w-4" />
           Print
@@ -35,7 +35,7 @@ export function QRPrintContent({ plants }: QRPrintContentProps) {
       </div>
 
       <div className="glass-card rounded-2xl p-4 sm:p-6 no-print">
-        <p className="text-xs text-white/40">
+        <p className="text-xs text-stone-500">
           These QR codes link to each plant&apos;s detail page. Print, cut, and attach to your pots.
           Each sticker is ~1.5 x 1.5 inches (4 x 4 cm) when printed at full size.
         </p>

@@ -107,15 +107,7 @@ export function CareContent({ plants, careTasks, careLogs, primaryPhotoMap = {} 
   );
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold text-stone-800">Care Overview</h1>
-        <p className="mt-1 text-stone-500">
-          {visibleTasks.length} active task{visibleTasks.length !== 1 ? 's' : ''}
-          {overdueTasks.length > 0 && ` · ${overdueTasks.length} overdue`}
-        </p>
-      </div>
-
+    <div className="space-y-6">
       {/* Plant filter chips — horizontal scroll on mobile */}
       {plantsWithTasks.length > 1 && (
         <div className="-mx-4 px-4 overflow-x-auto">

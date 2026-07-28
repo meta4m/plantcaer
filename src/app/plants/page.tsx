@@ -61,7 +61,7 @@ export default async function PlantsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-stone-800">Plants</h1>
+          <h1 className="text-2xl font-bold text-stone-800 sm:text-3xl">Plants</h1>
           <p className="mt-1 text-stone-500">
             {plants?.length ?? 0} plant{plants?.length !== 1 ? 's' : ''}
           </p>

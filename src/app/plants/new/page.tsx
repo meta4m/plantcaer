@@ -201,7 +201,7 @@ export default function AddPlantPage() {
     <div className="max-w-2xl mx-auto">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-stone-800">Add a Plant</h1>
+          <h1 className="text-2xl font-bold text-stone-800 sm:text-3xl">Add a Plant</h1>
           <p className="mt-1 text-stone-500">Add a new plant to your collection.</p>
         </div>
         {/* AI Identify button in the header */}

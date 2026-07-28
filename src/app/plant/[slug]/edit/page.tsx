@@ -286,7 +286,7 @@ export default function EditPlantPage({
   return (
     <div className="max-w-2xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-stone-800">Edit Plant</h1>
+        <h1 className="text-2xl font-bold text-stone-800 sm:text-3xl">Edit Plant</h1>
         <p className="mt-1 text-stone-500">{formData.common_name || 'Unnamed plant'}</p>
       </div>
 

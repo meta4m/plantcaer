@@ -216,7 +216,7 @@ function SettingsPageContent() {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-stone-800">Settings</h1>
+        <h1 className="text-2xl font-bold text-stone-800 sm:text-3xl">Settings</h1>
         <p className="mt-1 text-stone-500">Manage your account and app configuration</p>
       </div>
 
