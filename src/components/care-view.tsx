@@ -6,6 +6,7 @@ import { CareContent } from '@/components/care-content';
 import { PlantCareCalendar, type CalendarEvent } from '@/components/plant-care-calendar';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { UI_ICONS } from '@/lib/icons';
 
 interface CareViewProps {
   plants: Plant[];
@@ -130,7 +131,7 @@ export function CareView({
           <PlantCareCalendar events={calendarEvents} plants={calendarPlants} />
         ) : (
           <div className="text-center py-20">
-            <span className="text-5xl mb-4 block">📅</span>
+            <UI_ICONS.care size={48} className="mx-auto mb-4 text-stone-300" aria-hidden="true" />
             <h2 className="text-xl font-semibold text-stone-700 mb-2">No plants yet</h2>
             <p className="text-stone-400 mb-6">
               Add plants and configure care tasks to see them on the calendar.

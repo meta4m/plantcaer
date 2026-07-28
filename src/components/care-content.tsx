@@ -1,11 +1,13 @@
 'use client';
 
 import type { Plant, CareTask, CareLog, TaskType } from '@/lib/types';
-import { TASK_TYPE_ICONS, TASK_TYPE_LABELS } from '@/lib/types';
+import { TASK_TYPE_LABELS } from '@/lib/types';
 import Link from 'next/link';
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
+import { TaskIcon } from '@/components/ui/task-icon';
+import { UI_ICONS } from '@/lib/icons';
 
 interface CareContentProps {
   plants: Plant[];
@@ -105,7 +107,7 @@ export function CareContent({ plants, careTasks, careLogs }: CareContentProps) {
 
       {tasksWithPlants.length === 0 && plants.length === 0 ? (
         <div className="glass-card rounded-2xl p-12 text-center">
-          <span className="text-5xl mb-4 block">🪴</span>
+          <UI_ICONS.plants size={48} className="mx-auto mb-4 text-stone-300" aria-hidden="true" />
           <h3 className="text-xl font-semibold text-stone-700 mb-2">No plants yet</h3>
           <p className="text-stone-400 text-sm mb-6">
             Add a plant first, then configure its care schedule.
@@ -119,7 +121,7 @@ export function CareContent({ plants, careTasks, careLogs }: CareContentProps) {
         </div>
       ) : tasksWithPlants.length === 0 ? (
         <div className="glass-card rounded-2xl p-12 text-center">
-          <span className="text-5xl mb-4 block">📋</span>
+          <UI_ICONS.clipboard size={48} className="mx-auto mb-4 text-stone-300" aria-hidden="true" />
           <h3 className="text-xl font-semibold text-stone-700 mb-2">No care tasks yet</h3>
           <p className="text-stone-400 text-sm mb-6">
             Configure care schedules for your plants to see them here.
@@ -229,9 +231,7 @@ function TaskRow({ task, onLog, logging }: {
 }) {
   return (
     <div className="flex items-center gap-4">
-      <span className="text-xl shrink-0">
-        {TASK_TYPE_ICONS[task.task_type as TaskType]}
-      </span>
+      <TaskIcon type={task.task_type as TaskType} size={20} className="shrink-0" />
       <div className="flex-1 min-w-0">
         <Link
           href={`/plant/${task.plant.slug}`}
@@ -267,7 +267,12 @@ function TaskRow({ task, onLog, logging }: {
           disabled={logging}
           className="rounded-lg bg-emerald-100 px-3 py-1.5 text-xs font-medium text-emerald-700 hover:bg-emerald-200 disabled:opacity-50 transition-all"
         >
-          {logging ? '...' : '✓ Done'}
+          {logging ? '...' : (
+            <span className="inline-flex items-center gap-1">
+              <UI_ICONS.check size={14} aria-hidden="true" />
+              Done
+            </span>
+          )}
         </button>
       </div>
     </div>

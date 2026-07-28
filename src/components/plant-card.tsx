@@ -1,8 +1,10 @@
 'use client';
 
-import { TASK_TYPE_ICONS, TASK_TYPE_LABELS, type Plant, type CareTask, type TaskType } from '@/lib/types';
+import { TASK_TYPE_LABELS, type Plant, type CareTask, type TaskType } from '@/lib/types';
 import Link from 'next/link';
 import { getPhotoUrl } from '@/lib/storage';
+import { TaskIcon } from '@/components/ui/task-icon';
+import { UI_ICONS } from '@/lib/icons';
 
 interface PlantCardProps {
   plant: Plant & { care_tasks?: CareTask[] };
@@ -39,15 +41,16 @@ export function PlantCard({ plant, primaryPhotoUrl }: PlantCardProps) {
             />
           </div>
         ) : (
-          <span className="text-2xl opacity-60 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-3">
-            🪴
+          <span className="opacity-60 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-3 text-stone-400">
+            <UI_ICONS.plants size={24} aria-hidden="true" />
           </span>
         )}
       </div>
 
       {plant.location && (
-        <p className="text-sm text-stone-500 mb-3">
-          📍 {plant.location}
+        <p className="flex items-center gap-1 text-sm text-stone-500 mb-3">
+          <UI_ICONS.location size={14} className="flex-shrink-0" aria-hidden="true" />
+          {plant.location}
         </p>
       )}
 
@@ -58,7 +61,7 @@ export function PlantCard({ plant, primaryPhotoUrl }: PlantCardProps) {
               key={task.id}
               className="inline-flex items-center gap-1 rounded-full bg-amber-50/50 px-2 py-0.5 text-xs text-stone-500"
             >
-              <span>{TASK_TYPE_ICONS[task.task_type as TaskType]}</span>
+              <TaskIcon type={task.task_type as TaskType} size={12} />
               <span>{TASK_TYPE_LABELS[task.task_type as TaskType]}</span>
             </span>
           ))}

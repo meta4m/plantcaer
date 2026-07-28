@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Lock, Sparkles, Bell, Loader2 } from 'lucide-react';
+import { UI_ICONS } from '@/lib/icons';
 import { createClient } from '@/lib/supabase';
 import { SettingsAiConfig } from '@/components/settings-ai-config';
 import { SettingsNotifications } from '@/components/settings-notifications';
@@ -275,7 +276,7 @@ function SettingsPageContent() {
 
           {pinSuccess && (
             <div className="flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200/50 px-4 py-3 mb-4 text-sm text-emerald-700">
-              <span>✓</span>
+              <UI_ICONS.check size={16} className="flex-shrink-0" aria-hidden="true" />
               {pinConfigured ? 'PIN updated successfully!' : 'PIN removed successfully!'}
             </div>
           )}
@@ -309,7 +310,11 @@ function SettingsPageContent() {
                     onClick={() => setShowPin(!showPin)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 transition-colors"
                   >
-                    {showPin ? '🙈' : '👁️'}
+                    {showPin ? (
+                      <UI_ICONS.eyeOff size={16} aria-label="Hide PIN" />
+                    ) : (
+                      <UI_ICONS.eye size={16} aria-label="Show PIN" />
+                    )}
                   </button>
                 </div>
               </div>

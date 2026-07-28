@@ -10,6 +10,7 @@ import {
   type TaskType,
   type CareTask,
 } from '@/lib/types';
+import { TaskIcon } from '@/components/ui/task-icon';
 
 /** Get PIN token from cookie (httpOnly: false, readable by client JS) */
 function getPinToken(): string | null {
@@ -336,7 +337,7 @@ export default function EditPlantPage({
               return (
                 <div key={taskType} className="glass-card rounded-xl p-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="text-lg">{getTaskIcon(taskType)}</span>
+                    <TaskIcon type={taskType} size={18} className="flex-shrink-0" />
                     <span className="text-sm font-medium text-stone-800">
                       {TASK_TYPE_LABELS[taskType]}
                     </span>
@@ -405,16 +406,4 @@ export default function EditPlantPage({
       </form>
     </div>
   );
-}
-
-function getTaskIcon(taskType: TaskType): string {
-  const icons: Record<TaskType, string> = {
-    watering: '💧',
-    fertilizing: '🌿',
-    repotting: '🪴',
-    pruning: '✂️',
-    pest_disease: '🐛',
-    propagation: '🌱',
-  };
-  return icons[taskType];
 }

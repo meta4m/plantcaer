@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { PlantCard } from '@/components/plant-card';
 import { Plus } from 'lucide-react';
+import { UI_ICONS } from '@/lib/icons';
 import { getAuthedUser } from '@/lib/get-user';
 
 export default async function PlantsPage() {
@@ -56,7 +57,7 @@ export default async function PlantsPage() {
 
       {!plants || plants.length === 0 ? (
         <div className="glass-card rounded-2xl p-12 text-center">
-          <span className="text-5xl mb-4 block">🪴</span>
+          <UI_ICONS.plants size={48} className="mx-auto mb-4 text-stone-300" aria-hidden="true" />
           <h3 className="text-xl font-semibold text-stone-700 mb-2">No plants yet</h3>
           <p className="text-stone-400 text-sm mb-6">
             Add your first plant to get started.

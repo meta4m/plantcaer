@@ -3,8 +3,10 @@
 import { useState } from 'react';
 import { Sparkles, Loader2, X, ExternalLink, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
 import { LIGHT_REQUIREMENT_LABELS, TASK_TYPE_LABELS } from '@/lib/types';
+import { UI_ICONS } from '@/lib/icons';
 import { identifyPlantAction } from '@/app/actions/identify-plant';
 import type { AiPlantSuggestion } from '@/lib/ai/types';
+import type { LucideIcon } from 'lucide-react';
 
 interface AiSuggestionOverlayProps {
   /** Base64-encoded photo (without data: prefix), or null for text-only mode */
@@ -22,30 +24,30 @@ interface AiSuggestionOverlayProps {
 }
 
 /** Verification site links for plant name lookups */
-const VERIFY_SITES = [
+const VERIFY_SITES: { name: string; url: (name: string) => string; icon: LucideIcon }[] = [
   {
     name: 'Wikipedia',
     url: (name: string) =>
       `https://en.wikipedia.org/wiki/${encodeURIComponent(name.replace(/ /g, '_'))}`,
-    icon: '📖',
+    icon: UI_ICONS.book,
   },
   {
     name: 'Google Search',
     url: (name: string) =>
       `https://www.google.com/search?q=${encodeURIComponent(name + ' plant')}`,
-    icon: '🔍',
+    icon: UI_ICONS.search,
   },
   {
     name: 'iNaturalist',
     url: (name: string) =>
       `https://www.inaturalist.org/search?q=${encodeURIComponent(name)}`,
-    icon: '🌿',
+    icon: UI_ICONS.plants,
   },
   {
     name: 'Plant ID',
     url: (name: string) =>
       `https://www.plantid.com/search?q=${encodeURIComponent(name)}`,
-    icon: '🪴',
+    icon: UI_ICONS.camera,
   },
 ];
 
@@ -145,7 +147,10 @@ export function AiSuggestionOverlay({
                 : `The AI will suggest plant details and care requirements for "${plantName}".`}
             </p>
             <div className="text-xs text-stone-400 space-y-1">
-              <p>⚠️ AI suggestions may not be accurate. Always verify before accepting.</p>
+              <p className="flex items-center justify-center gap-1.5">
+                <UI_ICONS.warning size={12} className="text-[var(--color-overdue,#d97706)] flex-shrink-0" aria-hidden="true" />
+                AI suggestions may not be accurate. Always verify before accepting.
+              </p>
               <p>Verification links will be provided for each suggestion.</p>
             </div>
             <button
@@ -210,7 +215,7 @@ export function AiSuggestionOverlay({
                         className="rounded-lg bg-stone-100/50 px-2 py-1 text-xs text-stone-500 hover:text-stone-800 hover:bg-stone-200/50 transition-all flex items-center gap-1"
                         title={`Verify on ${site.name}`}
                       >
-                        <span>{site.icon}</span>
+                        <site.icon className="h-3 w-3" aria-hidden="true" />
                         <ExternalLink className="h-3 w-3" />
                       </a>
                     ))}
@@ -230,17 +235,29 @@ export function AiSuggestionOverlay({
                 {result.light_requirement && (
                   <div className="rounded-lg bg-stone-100/50 p-3">
                     <p className="text-xs text-stone-400 mb-0.5">Light</p>
-                    <p className="text-stone-800">☀️ {LIGHT_REQUIREMENT_LABELS[result.light_requirement]}</p>
+                    <p className="flex items-center gap-1.5 text-stone-800">
+                      <UI_ICONS.sun size={14} className="text-[var(--color-sun)] flex-shrink-0" aria-hidden="true" />
+                      {LIGHT_REQUIREMENT_LABELS[result.light_requirement]}
+                    </p>
                   </div>
                 )}
                 <div className="rounded-lg bg-stone-100/50 p-3"><p className="text-xs text-stone-400 mb-0.5">Temperature</p>
-                    <p className="text-stone-800">🌡️ {result.min_temp}°C – {result.max_temp}°C</p>
+                    <p className="flex items-center gap-1.5 text-stone-800">
+                      <UI_ICONS.thermometer size={14} className="text-[var(--color-terracotta)] flex-shrink-0" aria-hidden="true" />
+                      {result.min_temp}°C – {result.max_temp}°C
+                    </p>
                 </div>
                 <div className="rounded-lg bg-stone-100/50 p-3"><p className="text-xs text-stone-400 mb-0.5">Humidity</p>
-                    <p className="text-stone-800">💧 {result.humidity_min}%+</p>
+                    <p className="flex items-center gap-1.5 text-stone-800">
+                      <UI_ICONS.droplets size={14} className="text-[var(--color-water)] flex-shrink-0" aria-hidden="true" />
+                      {result.humidity_min}%+
+                    </p>
                 </div>
                 <div className="rounded-lg bg-stone-100/50 p-3"><p className="text-xs text-stone-400 mb-0.5">Care Tasks</p>
-                    <p className="text-stone-800">📋 {result.care_tasks?.length || 0} suggested</p>
+                    <p className="flex items-center gap-1.5 text-stone-800">
+                      <UI_ICONS.clipboard size={14} className="text-stone-400 flex-shrink-0" aria-hidden="true" />
+                      {result.care_tasks?.length || 0} suggested
+                    </p>
                 </div>
               </div>
 

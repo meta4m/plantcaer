@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import type { Plant, CareLog, CareTask, TaskType } from '@/lib/types';
-import { TASK_TYPE_ICONS, TASK_TYPE_LABELS } from '@/lib/types';
+import { TASK_TYPE_LABELS } from '@/lib/types';
 import Link from 'next/link';
 import { PlantCard } from './plant-card';
+import { TaskIcon } from '@/components/ui/task-icon';
+import { UI_ICONS } from '@/lib/icons';
 
 interface DashboardContentProps {
   plants: Plant[];
@@ -68,7 +70,7 @@ export function DashboardContent({ plants, careLogs, careTasks, primaryPhotoMap 
           href="/plants/new"
           className="glass-card rounded-xl px-4 py-2.5 text-sm font-medium text-stone-700 hover:bg-stone-100/80 transition-all active:scale-[0.98] flex items-center gap-2"
         >
-          <span className="text-lg">+</span>
+          <UI_ICONS.add size={16} aria-hidden="true" />
           Add Plant
         </Link>
       </div>
@@ -119,7 +121,7 @@ export function DashboardContent({ plants, careLogs, careTasks, primaryPhotoMap 
                     task.isOverdue ? 'border-amber-500/20' : ''
                   }`}
                 >
-                  <span className="text-xl">{TASK_TYPE_ICONS[task.task_type as TaskType]}</span>
+                  <TaskIcon type={task.task_type as TaskType} size={20} className="flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-stone-800 truncate">
                       {TASK_TYPE_LABELS[task.task_type as TaskType]}
@@ -158,9 +160,7 @@ export function DashboardContent({ plants, careLogs, careTasks, primaryPhotoMap 
                     key={log.id}
                     className="glass-card rounded-xl p-4 flex items-center gap-3"
                   >
-                    <span className="text-lg">
-                      {TASK_TYPE_ICONS[log.task_type as TaskType]}
-                    </span>
+                    <TaskIcon type={log.task_type as TaskType} size={18} className="flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-stone-700">
                         <span className="font-medium">
@@ -189,7 +189,7 @@ export function DashboardContent({ plants, careLogs, careTasks, primaryPhotoMap 
         <h2 className="text-lg font-semibold text-stone-800 mb-4">Your Plants</h2>
         {plants.length === 0 ? (
           <div className="glass-card rounded-2xl p-12 text-center">
-            <span className="text-5xl mb-4 block">🪴</span>
+            <UI_ICONS.plants size={48} className="mx-auto mb-4 text-stone-300" aria-hidden="true" />
             <h3 className="text-xl font-semibold text-stone-700 mb-2">No plants yet</h3>
             <p className="text-stone-400 text-sm mb-6">
               Add your first plant to start tracking its care.
@@ -198,7 +198,7 @@ export function DashboardContent({ plants, careLogs, careTasks, primaryPhotoMap 
               href="/plants/new"
               className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 hover:bg-emerald-400 transition-all"
             >
-              <span>+</span>
+              <UI_ICONS.add size={16} aria-hidden="true" />
               Add your first plant
             </Link>
           </div>

@@ -8,9 +8,10 @@ import type { EventClickArg, DatesSetArg } from '@fullcalendar/core';
 import { createClient } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Loader2, X, Check, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Loader2, X, Check, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import type { TaskType } from '@/lib/types';
-import { TASK_TYPE_LABELS, TASK_TYPE_ICONS } from '@/lib/types';
+import { TASK_TYPE_LABELS } from '@/lib/types';
+import { TaskIcon } from '@/components/ui/task-icon';
 
 // FullCalendar v6 injects styles automatically via JS — no CSS import needed
 
@@ -245,7 +246,7 @@ export function PlantCareCalendar({ events, plants }: PlantCareCalendarProps) {
         style={{ backgroundColor: bgColor + '33', color: bgColor }}
         title={`${props.plantName} — ${eventInfo.event.title}`}
       >
-        <span className="shrink-0">{TASK_TYPE_ICONS[props.taskType]}</span>
+        <TaskIcon type={props.taskType} size={12} className="shrink-0" />
         <span className="truncate">{eventInfo.event.title}</span>
         <span className="opacity-60 truncate">· {props.plantName}</span>
       </div>
@@ -454,7 +455,7 @@ export function PlantCareCalendar({ events, plants }: PlantCareCalendarProps) {
             {/* No events for this day */}
             {modalEvents.length === 0 ? (
               <div className="text-center py-6">
-                <span className="text-3xl block mb-2">📅</span>
+                <Calendar size={28} className="mx-auto mb-2 text-white/40" aria-hidden="true" />
                 <p className="text-white/40 text-sm">No tasks for this day</p>
               </div>
             ) : selectedEvent ? (
@@ -484,9 +485,7 @@ export function PlantCareCalendar({ events, plants }: PlantCareCalendarProps) {
 
                 {/* Event details — no inline X button, it's in the top-right */}
                 <div className="flex items-start gap-3 mb-3">
-                  <span className="text-2xl shrink-0">
-                    {TASK_TYPE_ICONS[selectedEvent.extendedProps.taskType]}
-                  </span>
+                  <TaskIcon type={selectedEvent.extendedProps.taskType} size={24} className="shrink-0 mt-0.5" />
                   <div>
                     <h3 className="text-lg font-semibold text-stone-800">
                       {selectedEvent.title}

@@ -2,7 +2,6 @@
 
 import type { Plant, CareTask, CareLog, JournalEntry, PlantPhoto, GrowthRecord, TaskType } from '@/lib/types';
 import {
-  TASK_TYPE_ICONS,
   TASK_TYPE_LABELS,
   LIGHT_REQUIREMENT_LABELS,
 } from '@/lib/types';
@@ -15,6 +14,8 @@ import { getPhotoUrl } from '@/lib/storage';
 import { QRCode } from './qr-code';
 import { CopyAsPrompt } from './copy-as-prompt';
 import { GrowthTracking } from './growth-tracking';
+import { TaskIcon } from '@/components/ui/task-icon';
+import { UI_ICONS } from '@/lib/icons';
 
 interface PlantDetailContentProps {
   plant: Plant;
@@ -105,7 +106,9 @@ export function PlantDetailContent({
                 />
               </div>
             ) : (
-              <span className="text-4xl">🪴</span>
+              <span className="flex h-16 w-16 items-center justify-center rounded-xl bg-[var(--color-forest)]/10 text-[var(--color-forest)] flex-shrink-0">
+                <UI_ICONS.plants size={32} aria-hidden="true" />
+              </span>
             )}
             <div>
               <h1 className="text-3xl font-bold text-stone-800">
@@ -153,30 +156,36 @@ export function PlantDetailContent({
           {plant.location && (
             <div>
               <p className="text-xs text-stone-400 uppercase tracking-wider mb-1">Location</p>
-              <p className="text-sm text-stone-700">📍 {plant.location}</p>
+              <p className="flex items-center gap-1.5 text-sm text-stone-700">
+                <UI_ICONS.location size={14} className="text-stone-400 flex-shrink-0" aria-hidden="true" />
+                {plant.location}
+              </p>
             </div>
           )}
           {plant.light_requirement && (
             <div>
               <p className="text-xs text-stone-400 uppercase tracking-wider mb-1">Light</p>
-              <p className="text-sm text-stone-700">
-                ☀️ {LIGHT_REQUIREMENT_LABELS[plant.light_requirement]}
+              <p className="flex items-center gap-1.5 text-sm text-stone-700">
+                <UI_ICONS.sun size={14} className="text-[var(--color-sun)] flex-shrink-0" aria-hidden="true" />
+                {LIGHT_REQUIREMENT_LABELS[plant.light_requirement]}
               </p>
             </div>
           )}
           {plant.adopted_at && (
             <div>
               <p className="text-xs text-stone-400 uppercase tracking-wider mb-1">Adopted</p>
-              <p className="text-sm text-stone-700">
-                📅 {new Date(plant.adopted_at).toLocaleDateString()}
+              <p className="flex items-center gap-1.5 text-sm text-stone-700">
+                <UI_ICONS.care size={14} className="text-stone-400 flex-shrink-0" aria-hidden="true" />
+                {new Date(plant.adopted_at).toLocaleDateString()}
               </p>
             </div>
           )}
           {plant.min_temp && (
             <div>
               <p className="text-xs text-stone-400 uppercase tracking-wider mb-1">Temperature</p>
-              <p className="text-sm text-stone-700">
-                🌡️ {plant.min_temp}°C{plant.max_temp ? ` - ${plant.max_temp}°C` : ''}
+              <p className="flex items-center gap-1.5 text-sm text-stone-700">
+                <UI_ICONS.thermometer size={14} className="text-[var(--color-terracotta)] flex-shrink-0" aria-hidden="true" />
+                {plant.min_temp}°C{plant.max_temp ? ` - ${plant.max_temp}°C` : ''}
               </p>
             </div>
           )}
@@ -222,7 +231,8 @@ export function PlantDetailContent({
                 href={`/care/calendar?plant=${plant.slug}`}
                 className="glass-card rounded-xl px-3 py-1.5 text-xs font-medium text-stone-500 hover:text-stone-800 hover:bg-stone-100/80 transition-all flex items-center gap-1.5"
               >
-                📅 Calendar
+                <UI_ICONS.care size={12} aria-hidden="true" />
+                Calendar
               </Link>
             )}
           </div>
@@ -262,9 +272,7 @@ export function PlantDetailContent({
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <span className="text-xl">
-                          {TASK_TYPE_ICONS[task.task_type as TaskType]}
-                        </span>
+                        <TaskIcon type={task.task_type as TaskType} size={20} className="flex-shrink-0" />
                         <div>
                           <p className="text-sm font-medium text-stone-800">
                             {TASK_TYPE_LABELS[task.task_type as TaskType]}
@@ -318,7 +326,7 @@ export function PlantDetailContent({
                     key={log.id}
                     className="flex items-center gap-2 text-xs text-stone-400"
                   >
-                    <span>{TASK_TYPE_ICONS[log.task_type as TaskType]}</span>
+                    <TaskIcon type={log.task_type as TaskType} size={14} className="flex-shrink-0" />
                     <span className="text-stone-500">
                       {TASK_TYPE_LABELS[log.task_type as TaskType]}
                     </span>

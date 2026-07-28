@@ -1,0 +1,80 @@
+import {
+  Droplets,
+  Zap,
+  Container,
+  Scissors,
+  Bug,
+  Sprout,
+  Leaf,
+  Calendar,
+  LayoutDashboard,
+  Heart,
+  Plus,
+  User,
+  Settings,
+  ChevronDown,
+  ChevronRight,
+  Check,
+  X,
+  Camera,
+  Image,
+  Trash2,
+  Edit,
+  MapPin,
+  Clock,
+  AlertTriangle,
+  CircleCheck,
+  Sun,
+  Thermometer,
+  BookOpen,
+  Search,
+  ClipboardList,
+  Eye,
+  EyeOff,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import type { TaskType } from './types';
+
+/**
+ * Lucide icon + semantic color per care task type.
+ * Named TASK_TYPE_ICON_META to avoid confusion with the emoji map
+ * TASK_TYPE_ICONS exported from types.ts (kept for iCal/AI prompts).
+ */
+export const TASK_TYPE_ICON_META: Record<TaskType, { icon: LucideIcon; color: string }> = {
+  watering: { icon: Droplets, color: 'var(--color-water)' },
+  fertilizing: { icon: Zap, color: 'var(--color-sun)' },
+  repotting: { icon: Container, color: 'var(--color-terracotta)' },
+  pruning: { icon: Scissors, color: 'var(--color-forest)' },
+  pest_disease: { icon: Bug, color: '#dc2626' },
+  propagation: { icon: Sprout, color: '#16a34a' },
+};
+
+export const UI_ICONS = {
+  home: LayoutDashboard,
+  plants: Leaf,
+  care: Calendar,
+  stickers: Heart,
+  add: Plus,
+  user: User,
+  settings: Settings,
+  chevronDown: ChevronDown,
+  chevronRight: ChevronRight,
+  check: Check,
+  close: X,
+  camera: Camera,
+  image: Image,
+  trash: Trash2,
+  edit: Edit,
+  location: MapPin,
+  clock: Clock,
+  warning: AlertTriangle,
+  success: CircleCheck,
+  sun: Sun,
+  thermometer: Thermometer,
+  droplets: Droplets,
+  book: BookOpen,
+  search: Search,
+  clipboard: ClipboardList,
+  eye: Eye,
+  eyeOff: EyeOff,
+} as const;
