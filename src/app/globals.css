@@ -3,25 +3,54 @@
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Garden Studio design tokens */
+  --color-forest: #3d7a5a;
+  --color-forest-hover: #33654b;
+  --color-terracotta: #b5705b;
+  --color-water: #6aaccc;
+  --color-sun: #e0a33e;
+  --color-surface: #faf8f4;
+  --color-bg-base: #f5f0e8;
+  --color-text: #1c1917;
+  --color-text-muted: #78716c;
 }
 
 /* ==========================================
-   WARM EARTHY GLASSMORPHISM CARDS
+   SURFACE CARDS (opaque — no backdrop-filter)
+   Blur on every card destroys scroll perf on
+   mid-range Android. Only the navbar keeps it.
    ========================================== */
 .glass-card {
+  background: var(--color-surface);
+  border: 1px solid rgba(80, 60, 40, 0.06);
+  box-shadow:
+    0 1px 3px rgba(80, 60, 40, 0.08),
+    0 4px 16px rgba(80, 60, 40, 0.04);
+}
+
+.glass-card-strong {
+  background: var(--color-surface);
+  border: 1px solid rgba(80, 60, 40, 0.1);
+  box-shadow:
+    0 2px 6px rgba(80, 60, 40, 0.1),
+    0 8px 28px rgba(80, 60, 40, 0.06);
+}
+
+/* Navbar keeps blur — single element, acceptable cost */
+.navbar-glass {
   background: rgba(255, 252, 245, 0.75);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(214, 211, 209, 0.5);
   box-shadow: 0 4px 24px rgba(80, 60, 40, 0.06);
 }
 
-.glass-card-strong {
-  background: rgba(255, 252, 245, 0.85);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(214, 211, 209, 0.6);
-  box-shadow: 0 8px 32px rgba(80, 60, 40, 0.08);
+/* Bottom nav — opaque so content scrolling under it stays legible */
+.bottom-nav-surface {
+  background: rgba(250, 248, 244, 0.96);
+  border-top: 1px solid rgba(80, 60, 40, 0.08);
+  box-shadow: 0 -1px 12px rgba(80, 60, 40, 0.06);
 }
 
 /* ==========================================

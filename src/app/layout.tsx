@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
+import { BottomNav } from "@/components/bottom-nav";
 import { ServiceWorkerRegistration } from "@/components/service-worker-registration";
 
 const geistSans = Geist({
@@ -62,8 +63,9 @@ export default function RootLayout({
           color: '#1c1917',
         }}>
         <Navbar />
+        <BottomNav />
         <ServiceWorkerRegistration />
-        <main className="mx-auto max-w-6xl px-4 pb-12 pt-6">
+        <main className="mx-auto max-w-6xl px-4 pb-20 sm:pb-12 pt-6">
           {children}
         </main>
       </body>
