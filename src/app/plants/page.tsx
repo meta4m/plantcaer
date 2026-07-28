@@ -6,6 +6,7 @@ import { PlantCard } from '@/components/plant-card';
 import { Plus } from 'lucide-react';
 import { UI_ICONS } from '@/lib/icons';
 import { getAuthedUser } from '@/lib/get-user';
+import { getPlantDueSummary } from '@/lib/plant-status';
 
 export default async function PlantsPage() {
   const supabase = await createClient();
@@ -21,6 +22,26 @@ export default async function PlantsPage() {
     .order('created_at', { ascending: false });
 
   const plantIds = plants?.map((p) => p.id) ?? [];
+
+  // Active care tasks + recent logs, for per-plant due status on the cards
+  const { data: careTasks } = plantIds.length > 0
+    ? await db
+        .from('care_tasks')
+        .select('*')
+        .in('plant_id', plantIds)
+        .eq('is_active', true)
+    : { data: [] };
+
+  const { data: careLogs } = plantIds.length > 0
+    ? await db
+        .from('care_logs')
+        .select('*')
+        .in('plant_id', plantIds)
+        .order('logged_at', { ascending: false })
+    : { data: [] };
+
+  const tasks = careTasks ?? [];
+  const logs = careLogs ?? [];
 
   // Fetch primary photos for all plants
   const { data: allPhotos } = plantIds.length > 0
@@ -77,6 +98,10 @@ export default async function PlantsPage() {
               key={plant.id}
               plant={plant}
               primaryPhotoUrl={primaryPhotoMap[plant.id] ?? null}
+              dueSummary={getPlantDueSummary(
+                tasks.filter((t) => t.plant_id === plant.id),
+                logs.filter((l) => l.plant_id === plant.id),
+              )}
             />
           ))}
         </div>

@@ -1,75 +1,80 @@
 'use client';
 
-import { TASK_TYPE_LABELS, type Plant, type CareTask, type TaskType } from '@/lib/types';
+import { type Plant } from '@/lib/types';
 import Link from 'next/link';
 import { getPhotoUrl } from '@/lib/storage';
-import { TaskIcon } from '@/components/ui/task-icon';
 import { UI_ICONS } from '@/lib/icons';
+import {
+  getStatusColor,
+  formatDueBadge,
+  type PlantDueSummary,
+} from '@/lib/plant-status';
 
 interface PlantCardProps {
-  plant: Plant & { care_tasks?: CareTask[] };
+  plant: Plant;
   primaryPhotoUrl?: string | null;
+  /** Due status computed by the parent (tasks + logs). Omit for a neutral card. */
+  dueSummary?: PlantDueSummary;
 }
 
-export function PlantCard({ plant, primaryPhotoUrl }: PlantCardProps) {
-  const tasksDue = plant.care_tasks?.filter((t) => t.is_active) ?? [];
+export function PlantCard({ plant, primaryPhotoUrl, dueSummary }: PlantCardProps) {
+  const badge = dueSummary ? formatDueBadge(dueSummary) : null;
+  const statusColor = dueSummary ? getStatusColor(dueSummary) : 'var(--color-forest)';
 
   return (
     <Link
       href={`/plant/${plant.slug}`}
-      className="glass-card group rounded-2xl p-5 block transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-500/5"
+      className="glass-card group relative block overflow-hidden rounded-2xl transition-all duration-300 hover:shadow-lg hover:shadow-[rgba(80,60,40,0.12)]"
     >
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-semibold text-stone-800 group-hover:text-emerald-600 transition-colors truncate">
-            {plant.nickname || plant.common_name}
-          </h3>
-          {plant.nickname && plant.common_name && (
-            <p className="text-sm text-stone-400 truncate mt-0.5">{plant.common_name}</p>
-          )}
-          {!plant.nickname && plant.scientific_name && (
-            <p className="text-sm text-stone-400 italic mt-0.5 truncate">{plant.scientific_name}</p>
-          )}
-        </div>
-        {/* Primary photo thumbnail or placeholder */}
+      {/* Status left border: forest → amber → red */}
+      <span
+        className="absolute left-0 top-0 bottom-0 w-1 z-10"
+        style={{ backgroundColor: statusColor }}
+        aria-hidden="true"
+      />
+
+      <div className="relative aspect-[16/10] w-full overflow-hidden">
         {primaryPhotoUrl ? (
-          <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 ml-3 ring-1 ring-white/10">
-            <img
-              src={getPhotoUrl(primaryPhotoUrl)}
-              alt={plant.nickname || plant.common_name}
-              className="w-full h-full object-cover transition-all duration-300 group-hover:scale-110"
-            />
-          </div>
+          <img
+            src={getPhotoUrl(primaryPhotoUrl)}
+            alt={plant.nickname || plant.common_name}
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          />
         ) : (
-          <span className="opacity-60 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-3 text-stone-400">
-            <UI_ICONS.plants size={24} aria-hidden="true" />
-          </span>
+          <div className="absolute inset-0 flex items-center justify-center bg-[var(--color-forest)]/8 text-[var(--color-forest)]/40">
+            <UI_ICONS.plants size={56} aria-hidden="true" />
+          </div>
         )}
-      </div>
 
-      {plant.location && (
-        <p className="flex items-center gap-1 text-sm text-stone-500 mb-3">
-          <UI_ICONS.location size={14} className="flex-shrink-0" aria-hidden="true" />
-          {plant.location}
-        </p>
-      )}
-
-      {tasksDue.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {tasksDue.slice(0, 4).map((task) => (
-            <span
-              key={task.id}
-              className="inline-flex items-center gap-1 rounded-full bg-amber-50/50 px-2 py-0.5 text-xs text-stone-500"
-            >
-              <TaskIcon type={task.task_type as TaskType} size={12} />
-              <span>{TASK_TYPE_LABELS[task.task_type as TaskType]}</span>
-            </span>
-          ))}
-          {tasksDue.length > 4 && (
-            <span className="text-xs text-stone-400">+{tasksDue.length - 4} more</span>
-          )}
+        {/* Name / status overlay with gradient fade */}
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/35 to-transparent px-4 pb-3 pt-12">
+          <div className="flex items-end justify-between gap-2">
+            <div className="min-w-0">
+              <h3 className="text-base font-semibold text-white truncate">
+                {plant.nickname || plant.common_name}
+              </h3>
+              {(plant.nickname && plant.common_name) || plant.scientific_name ? (
+                <p className="text-xs text-white/70 truncate mt-0.5">
+                  {plant.nickname && plant.common_name
+                    ? plant.common_name
+                    : plant.scientific_name}
+                </p>
+              ) : null}
+            </div>
+            {badge && (
+              <span
+                className={`flex-shrink-0 rounded-full px-2.5 py-1 text-[11px] font-medium ${
+                  dueSummary!.overdue > 0
+                    ? 'bg-red-500/90 text-white'
+                    : 'bg-white/90 text-stone-700'
+                }`}
+              >
+                {badge}
+              </span>
+            )}
+          </div>
         </div>
-      )}
+      </div>
     </Link>
   );
 }

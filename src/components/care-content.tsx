@@ -8,15 +8,18 @@ import { createClient } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { TaskIcon } from '@/components/ui/task-icon';
 import { UI_ICONS } from '@/lib/icons';
+import { getPhotoUrl } from '@/lib/storage';
 
 interface CareContentProps {
   plants: Plant[];
   careTasks: CareTask[];
   careLogs: CareLog[];
+  primaryPhotoMap?: Record<string, string>;
 }
 
-export function CareContent({ plants, careTasks, careLogs }: CareContentProps) {
+export function CareContent({ plants, careTasks, careLogs, primaryPhotoMap = {} }: CareContentProps) {
   const [logging, setLogging] = useState<string | null>(null);
+  const [selectedPlantId, setSelectedPlantId] = useState<string | null>(null);
   const router = useRouter();
   const supabase = createClient();
 
@@ -83,15 +86,23 @@ export function CareContent({ plants, careTasks, careLogs }: CareContentProps) {
     })
     .filter((t): t is NonNullable<typeof t> => t !== null);
 
+  // Plant filter: chips show only plants that currently have tasks
+  const plantsWithTasks = plants.filter((p) =>
+    tasksWithPlants.some((t) => t.plant_id === p.id)
+  );
+  const visibleTasks = selectedPlantId
+    ? tasksWithPlants.filter((t) => t.plant_id === selectedPlantId)
+    : tasksWithPlants;
+
   // Group tasks
-  const overdueTasks = tasksWithPlants.filter((t) => t.isOverdue);
-  const todayTasks = tasksWithPlants.filter(
+  const overdueTasks = visibleTasks.filter((t) => t.isOverdue);
+  const todayTasks = visibleTasks.filter(
     (t) => !t.isOverdue && t.daysUntilDue !== null && t.daysUntilDue <= 1
   );
-  const upcomingTasks = tasksWithPlants.filter(
+  const upcomingTasks = visibleTasks.filter(
     (t) => !t.isOverdue && t.daysUntilDue !== null && t.daysUntilDue > 1 && t.daysUntilDue <= 7
   );
-  const otherTasks = tasksWithPlants.filter(
+  const otherTasks = visibleTasks.filter(
     (t) => !t.isOverdue && (t.daysUntilDue === null || t.daysUntilDue > 7)
   );
 
@@ -100,10 +111,33 @@ export function CareContent({ plants, careTasks, careLogs }: CareContentProps) {
       <div>
         <h1 className="text-3xl font-bold text-stone-800">Care Overview</h1>
         <p className="mt-1 text-stone-500">
-          {tasksWithPlants.length} active task{tasksWithPlants.length !== 1 ? 's' : ''}
+          {visibleTasks.length} active task{visibleTasks.length !== 1 ? 's' : ''}
           {overdueTasks.length > 0 && ` · ${overdueTasks.length} overdue`}
         </p>
       </div>
+
+      {/* Plant filter chips — horizontal scroll on mobile */}
+      {plantsWithTasks.length > 1 && (
+        <div className="-mx-4 px-4 overflow-x-auto">
+          <div className="flex w-max flex-nowrap gap-2">
+            <FilterChip
+              active={selectedPlantId === null}
+              onClick={() => setSelectedPlantId(null)}
+              label="All plants"
+            />
+            {plantsWithTasks.map((plant) => (
+              <FilterChip
+                key={plant.id}
+                active={selectedPlantId === plant.id}
+                onClick={() =>
+                  setSelectedPlantId(selectedPlantId === plant.id ? null : plant.id)
+                }
+                label={plant.nickname || plant.common_name}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       {tasksWithPlants.length === 0 && plants.length === 0 ? (
         <div className="glass-card rounded-2xl p-12 text-center">
@@ -150,6 +184,7 @@ export function CareContent({ plants, careTasks, careLogs }: CareContentProps) {
                   >
                     <TaskRow
                       task={task}
+                      photoUrl={primaryPhotoMap[task.plant_id] ?? null}
                       onLog={() => handleLogCare(task.id, task.task_type as TaskType, task.plant_id)}
                       logging={logging === task.id}
                     />
@@ -170,6 +205,7 @@ export function CareContent({ plants, careTasks, careLogs }: CareContentProps) {
                   <div key={task.id} className="glass-card rounded-xl p-4">
                     <TaskRow
                       task={task}
+                      photoUrl={primaryPhotoMap[task.plant_id] ?? null}
                       onLog={() => handleLogCare(task.id, task.task_type as TaskType, task.plant_id)}
                       logging={logging === task.id}
                     />
@@ -190,6 +226,7 @@ export function CareContent({ plants, careTasks, careLogs }: CareContentProps) {
                   <div key={task.id} className="glass-card rounded-xl p-4">
                     <TaskRow
                       task={task}
+                      photoUrl={primaryPhotoMap[task.plant_id] ?? null}
                       onLog={() => handleLogCare(task.id, task.task_type as TaskType, task.plant_id)}
                       logging={logging === task.id}
                     />
@@ -210,6 +247,7 @@ export function CareContent({ plants, careTasks, careLogs }: CareContentProps) {
                   <div key={task.id} className="glass-card rounded-xl p-4">
                     <TaskRow
                       task={task}
+                      photoUrl={primaryPhotoMap[task.plant_id] ?? null}
                       onLog={() => handleLogCare(task.id, task.task_type as TaskType, task.plant_id)}
                       logging={logging === task.id}
                     />
@@ -224,18 +262,51 @@ export function CareContent({ plants, careTasks, careLogs }: CareContentProps) {
   );
 }
 
-function TaskRow({ task, onLog, logging }: {
+function FilterChip({ active, onClick, label }: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex min-h-[44px] items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all ${
+        active
+          ? 'bg-[var(--color-forest)] text-white shadow-sm'
+          : 'glass-card text-stone-500 hover:text-stone-800'
+      }`}
+    >
+      <UI_ICONS.plants size={14} aria-hidden="true" />
+      {label}
+    </button>
+  );
+}
+
+function TaskRow({ task, photoUrl, onLog, logging }: {
   task: CareTask & { plant: Plant; lastLog: CareLog | undefined; daysSinceLast: number | null; isOverdue: boolean; daysUntilDue: number | null };
+  photoUrl: string | null;
   onLog: () => void;
   logging: boolean;
 }) {
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-3">
+      {/* Plant photo thumb */}
+      {photoUrl ? (
+        <img
+          src={getPhotoUrl(photoUrl)}
+          alt=""
+          className="h-8 w-8 rounded-full object-cover flex-shrink-0"
+        />
+      ) : (
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-forest)]/10 text-[var(--color-forest)] flex-shrink-0">
+          <UI_ICONS.plants size={16} aria-hidden="true" />
+        </span>
+      )}
       <TaskIcon type={task.task_type as TaskType} size={20} className="shrink-0" />
       <div className="flex-1 min-w-0">
         <Link
           href={`/plant/${task.plant.slug}`}
-          className="text-sm font-medium text-stone-800 hover:text-emerald-600 transition-colors"
+          className="text-sm font-medium text-stone-800 hover:text-[var(--color-forest)] transition-colors"
         >
           {task.plant.nickname || task.plant.common_name}
         </Link>
@@ -246,7 +317,7 @@ function TaskRow({ task, onLog, logging }: {
             ` · ${task.daysSinceLast}d since last`}
         </p>
       </div>
-      <div className="flex items-center gap-3 shrink-0">
+      <div className="flex items-center gap-2 shrink-0">
         {task.daysUntilDue !== null && (
           <span
             className={`text-xs ${
@@ -262,17 +333,14 @@ function TaskRow({ task, onLog, logging }: {
               : `${task.daysUntilDue}d`}
           </span>
         )}
+        {/* Inline Done — 48px touch target */}
         <button
           onClick={onLog}
           disabled={logging}
-          className="rounded-lg bg-emerald-100 px-3 py-1.5 text-xs font-medium text-emerald-700 hover:bg-emerald-200 disabled:opacity-50 transition-all"
+          aria-label={`Mark ${TASK_TYPE_LABELS[task.task_type as TaskType]} done for ${task.plant.nickname || task.plant.common_name}`}
+          className="flex h-12 w-12 items-center justify-center rounded-full text-[var(--color-forest)] hover:bg-[var(--color-forest)]/10 active:bg-[var(--color-forest)]/20 disabled:opacity-40 transition-colors"
         >
-          {logging ? '...' : (
-            <span className="inline-flex items-center gap-1">
-              <UI_ICONS.check size={14} aria-hidden="true" />
-              Done
-            </span>
-          )}
+          <UI_ICONS.check size={20} aria-hidden="true" />
         </button>
       </div>
     </div>

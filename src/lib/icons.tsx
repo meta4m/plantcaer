@@ -75,6 +75,7 @@ export const UI_ICONS = {
   book: BookOpen,
   search: Search,
   clipboard: ClipboardList,
+  growth: Sprout,
   eye: Eye,
   eyeOff: EyeOff,
 } as const;

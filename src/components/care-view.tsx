@@ -14,6 +14,7 @@ interface CareViewProps {
   careLogs: CareLog[];
   calendarEvents: CalendarEvent[];
   calendarPlants: { id: string; slug: string; nickname: string | null; common_name: string }[];
+  primaryPhotoMap?: Record<string, string>;
   defaultView: 'list' | 'calendar';
   plantSlug?: string;
   hasPlants: boolean;
@@ -25,6 +26,7 @@ export function CareView({
   careLogs,
   calendarEvents,
   calendarPlants,
+  primaryPhotoMap = {},
   defaultView,
   plantSlug,
   hasPlants,
@@ -122,6 +124,7 @@ export function CareView({
           plants={plants}
           careTasks={careTasks}
           careLogs={careLogs}
+          primaryPhotoMap={primaryPhotoMap}
         />
       )}
 

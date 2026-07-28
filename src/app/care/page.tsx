@@ -38,6 +38,20 @@ async function CarePageContent({ searchParams }: {
     .in('plant_id', plantIds)
     .order('logged_at', { ascending: false });
 
+  // Primary photos for task-row thumbnails
+  const { data: allPhotos } = plantIds.length > 0
+    ? await db
+        .from('plant_photos')
+        .select('plant_id, url')
+        .in('plant_id', plantIds)
+        .eq('is_primary', true)
+    : { data: [] };
+
+  const primaryPhotoMap: Record<string, string> = {};
+  for (const photo of allPhotos ?? []) {
+    primaryPhotoMap[photo.plant_id] = photo.url;
+  }
+
   const tasks = careTasks ?? [];
   const logs = careLogs ?? [];
 
@@ -139,6 +153,7 @@ async function CarePageContent({ searchParams }: {
       careLogs={logs}
       calendarEvents={events}
       calendarPlants={filteredPlants}
+      primaryPhotoMap={primaryPhotoMap}
       defaultView={view}
       plantSlug={plantSlug}
       hasPlants={!!plants && plants.length > 0}
