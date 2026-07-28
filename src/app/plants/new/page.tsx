@@ -118,8 +118,6 @@ export default function AddPlantPage() {
     }
   }, []);
 
-  const [aiCareTasks, setAiCareTasks] = useState<AiPlantSuggestion['care_tasks'] | null>(null);
-
   const handleNicknameGenerated = useCallback((nickname: string) => {
     handleChange('nickname', nickname);
   }, []);
