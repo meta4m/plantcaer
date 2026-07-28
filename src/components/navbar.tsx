@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { UI_ICONS } from '@/lib/icons';
+import { Logo } from '@/components/ui/logo';
 
 export function Navbar() {
   const [user, setUser] = useState<{ email?: string } | null>(null);
@@ -54,7 +54,7 @@ export function Navbar() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
               <Link href="/" className="flex items-center gap-2">
-                <UI_ICONS.plants size={22} className="text-[var(--color-forest)]" aria-hidden="true" />
+                <Logo size={22} className="text-[var(--color-forest)]" />
                 <span className="text-lg font-bold text-stone-800">plantcaer</span>
               </Link>
               <div className="hidden sm:flex items-center gap-1">

@@ -91,6 +91,8 @@ export default function AddPlantPage() {
     setShowAiOverlay(true);
   };
 
+  const [aiCareTasks, setAiCareTasks] = useState<AiPlantSuggestion['care_tasks'] | null>(null);
+
   const handleAcceptSuggestion = useCallback((suggestion: AiPlantSuggestion) => {
     setFormData((prev) => ({
       common_name: suggestion.common_name || prev.common_name,
