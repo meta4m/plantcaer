@@ -6,8 +6,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { slugify, LIGHT_REQUIREMENT_LABELS, type LightRequirement } from '@/lib/types';
 import { PhotoUpload } from '@/components/photo-upload';
 import { uploadPlantPhoto } from '@/lib/storage';
-import { identifyPlantAction } from '@/app/actions/identify-plant';
-import { Sparkles, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { AiSuggestionOverlay, AiIdentifyButton, AiNicknameButton } from '@/components/ai-suggestion-overlay';
+import { Loader2 } from 'lucide-react';
 import type { AiPlantSuggestion } from '@/lib/ai/types';
 
 function fileToBase64(file: File): Promise<string> {
@@ -15,7 +15,6 @@ function fileToBase64(file: File): Promise<string> {
     const reader = new FileReader();
     reader.onload = () => {
       const result = reader.result as string;
-      // Strip the data:image/...;base64, prefix
       const base64 = result.split(',')[1];
       resolve(base64);
     };
@@ -29,17 +28,17 @@ export default function AddPlantPage() {
   const supabase = createClient();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [aiEnabled, setAiEnabled] = useState(true); // default is enabled (preset default always works)
 
   const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoUploading, setPhotoUploading] = useState(false);
   const [photoError, setPhotoError] = useState<string | null>(null);
 
-  // AI identify states
-  const [aiIdentifying, setAiIdentifying] = useState(false);
-  const [aiError, setAiError] = useState<string | null>(null);
-  const [aiResult, setAiResult] = useState<AiPlantSuggestion | null>(null);
-  const [aiApplied, setAiApplied] = useState(false);
+  // AI overlay state
+  const [showAiOverlay, setShowAiOverlay] = useState(false);
+  const [photoBase64, setPhotoBase64] = useState<string | null>(null);
+  const [aiAppliedWarning, setAiAppliedWarning] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     common_name: '',
@@ -59,13 +58,18 @@ export default function AddPlantPage() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handlePhotoSelect = (file: File) => {
+  // AI can work with photo OR with just a plant name
+  const canUseAi = aiEnabled && (!!selectedPhoto || formData.common_name.trim().length > 0);
+
+  const handlePhotoSelect = async (file: File) => {
     setSelectedPhoto(file);
     setPhotoPreview(URL.createObjectURL(file));
     setPhotoError(null);
-    setAiResult(null);
-    setAiApplied(false);
-    setAiError(null);
+    setShowAiOverlay(false);
+
+    // Pre-convert to base64 for AI
+    const base64 = await fileToBase64(file);
+    setPhotoBase64(base64);
   };
 
   // Cleanup object URL on unmount
@@ -79,60 +83,44 @@ export default function AddPlantPage() {
     setSelectedPhoto(null);
     if (photoPreview) URL.revokeObjectURL(photoPreview);
     setPhotoPreview(null);
+    setPhotoBase64(null);
     setPhotoError(null);
-    setAiResult(null);
-    setAiApplied(false);
-    setAiError(null);
   };
 
-  const handleAiIdentify = useCallback(async () => {
-    if (!selectedPhoto) return;
+  const handleOpenAiOverlay = () => {
+    setShowAiOverlay(true);
+  };
 
-    setAiIdentifying(true);
-    setAiError(null);
-    setAiResult(null);
+  const [aiCareTasks, setAiCareTasks] = useState<AiPlantSuggestion['care_tasks'] | null>(null);
 
-    try {
-      const base64 = await fileToBase64(selectedPhoto);
-      const result = await identifyPlantAction(base64, selectedPhoto.type);
-
-      if (result.error) {
-        setAiError(result.error);
-        return;
-      }
-
-      if (!result.data) {
-        setAiError('AI returned no data. Please try again.');
-        return;
-      }
-
-      setAiResult(result.data);
-    } catch (err) {
-      setAiError(err instanceof Error ? err.message : 'Failed to identify plant');
-    } finally {
-      setAiIdentifying(false);
-    }
-  }, [selectedPhoto]);
-
-  const applyAiSuggestion = useCallback(() => {
-    if (!aiResult) return;
-
-    setFormData({
-      common_name: aiResult.common_name || '',
-      scientific_name: aiResult.scientific_name || '',
-      nickname: '',
+  const handleAcceptSuggestion = useCallback((suggestion: AiPlantSuggestion) => {
+    setFormData((prev) => ({
+      common_name: suggestion.common_name || prev.common_name,
+      scientific_name: suggestion.scientific_name || '',
+      nickname: prev.nickname, // Keep existing nickname
       species: '',
-      location: '',
-      adopted_at: formData.adopted_at,
-      light_requirement: aiResult.light_requirement || '',
-      min_temp: aiResult.min_temp ? String(aiResult.min_temp) : '',
-      max_temp: aiResult.max_temp ? String(aiResult.max_temp) : '',
-      humidity_min: aiResult.humidity_min ? String(aiResult.humidity_min) : '',
-      notes: aiResult.notes || '',
-    });
+      location: prev.location,
+      adopted_at: prev.adopted_at,
+      light_requirement: suggestion.light_requirement || '',
+      min_temp: suggestion.min_temp ? String(suggestion.min_temp) : '',
+      max_temp: suggestion.max_temp ? String(suggestion.max_temp) : '',
+      humidity_min: suggestion.humidity_min ? String(suggestion.humidity_min) : '',
+      notes: suggestion.notes || '',
+    }));
 
-    setAiApplied(true);
-  }, [aiResult, formData.adopted_at]);
+    setShowAiOverlay(false);
+    setAiAppliedWarning('AI suggestions applied! Review the fields below. You can verify details using the links shown in the popup.');
+    setTimeout(() => setAiAppliedWarning(null), 6000);
+
+    // If AI provided care tasks, store them for submission
+    if (suggestion.care_tasks && suggestion.care_tasks.length > 0) {
+      setAiCareTasks(suggestion.care_tasks);
+    }
+  }, []);
+
+  const handleNicknameGenerated = useCallback((nickname: string) => {
+    handleChange('nickname', nickname);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -187,8 +175,8 @@ export default function AddPlantPage() {
       }
 
       // If AI provided care tasks, create them
-      if (aiResult?.care_tasks && aiResult.care_tasks.length > 0 && plant) {
-        for (const task of aiResult.care_tasks) {
+      if (aiCareTasks && aiCareTasks.length > 0 && plant) {
+        for (const task of aiCareTasks) {
           await supabase.from('care_tasks').insert({
             plant_id: plant.id,
             task_type: task.task_type,
@@ -211,19 +199,33 @@ export default function AddPlantPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white">Add a Plant</h1>
-        <p className="mt-1 text-white/50">Add a new plant to your collection.</p>
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-stone-800 sm:text-3xl">Add a Plant</h1>
+          <p className="mt-1 text-stone-500">Add a new plant to your collection.</p>
+        </div>
+        {/* AI Identify button in the header */}
+        <AiIdentifyButton
+          enabled={canUseAi}
+          loading={false}
+          onClick={handleOpenAiOverlay}
+        />
       </div>
 
       <form onSubmit={handleSubmit} className="glass-card rounded-2xl p-6 sm:p-8 space-y-6">
         {error && (
-          <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
+          <div className="rounded-xl bg-red-50 border border-red-200/50 px-4 py-3 text-sm text-red-600">
             {error}
           </div>
         )}
 
-        {/* Photo upload + AI identify */}
+        {aiAppliedWarning && (
+          <div className="rounded-xl bg-amber-50 border border-amber-200/50 px-4 py-3 text-sm text-amber-700">
+            {aiAppliedWarning}
+          </div>
+        )}
+
+        {/* Photo upload */}
         <div className="space-y-3">
           <PhotoUpload
             onFileSelect={handlePhotoSelect}
@@ -233,126 +235,12 @@ export default function AddPlantPage() {
             error={photoError}
             plantName={formData.common_name || undefined}
           />
-
-          {/* AI Identify button */}
-          {selectedPhoto && !aiIdentifying && !aiResult && (
-            <button
-              type="button"
-              onClick={handleAiIdentify}
-              className="w-full flex items-center justify-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2.5 text-sm font-medium text-emerald-300 hover:bg-emerald-500/20 hover:text-emerald-200 transition-all"
-            >
-              <Sparkles className="h-4 w-4" />
-              AI Identify Plant from Photo
-            </button>
-          )}
-
-          {/* AI identifying state */}
-          {aiIdentifying && (
-            <div className="flex items-center justify-center gap-2 rounded-xl bg-white/5 px-4 py-3 text-sm text-white/60">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Identifying plant with AI...
-            </div>
-          )}
-
-          {/* AI error */}
-          {aiError && (
-            <div className="flex items-start gap-2 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
-              <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
-              <div>
-                <p className="font-medium">AI identification failed</p>
-                <p className="text-red-300/70 mt-0.5">{aiError}</p>
-                <button
-                  type="button"
-                  onClick={handleAiIdentify}
-                  className="mt-1.5 text-xs text-red-300 hover:text-red-200 underline underline-offset-2 transition-colors"
-                >
-                  Try again
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* AI result preview */}
-          {aiResult && !aiApplied && (
-            <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-4 space-y-3">
-              <div className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-emerald-400" />
-                <p className="text-sm font-medium text-emerald-300">AI identified this plant as:</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div>
-                  <span className="text-xs text-white/40">Name</span>
-                  <p className="text-white font-medium">{aiResult.common_name}</p>
-                </div>
-                {aiResult.scientific_name && (
-                  <div>
-                    <span className="text-xs text-white/40">Scientific</span>
-                    <p className="text-white/80 italic">{aiResult.scientific_name}</p>
-                  </div>
-                )}
-                {aiResult.light_requirement && (
-                  <div>
-                    <span className="text-xs text-white/40">Light</span>
-                    <p className="text-white">{LIGHT_REQUIREMENT_LABELS[aiResult.light_requirement]}</p>
-                  </div>
-                )}
-                <div>
-                  <span className="text-xs text-white/40">Temperature</span>
-                  <p className="text-white">{aiResult.min_temp}°C – {aiResult.max_temp}°C</p>
-                </div>
-                <div>
-                  <span className="text-xs text-white/40">Humidity</span>
-                  <p className="text-white">{aiResult.humidity_min}%+</p>
-                </div>
-                <div>
-                  <span className="text-xs text-white/40">Care tasks</span>
-                  <p className="text-white">{aiResult.care_tasks?.length || 0} tasks suggested</p>
-                </div>
-              </div>
-
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={applyAiSuggestion}
-                  className="flex-1 rounded-xl bg-emerald-500 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-400 transition-all active:scale-[0.98]"
-                >
-                  Apply Suggestions
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setAiResult(null)}
-                  className="rounded-xl border border-white/10 px-3 py-2 text-xs text-white/50 hover:text-white hover:bg-white/5 transition-all"
-                >
-                  Dismiss
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* AI applied confirmation */}
-          {aiApplied && (
-            <div className="flex items-center gap-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-3 text-sm text-emerald-300">
-              <CheckCircle2 className="h-4 w-4" />
-              AI suggestions applied! Review and adjust the fields below.
-              <button
-                type="button"
-                onClick={() => {
-                  setAiApplied(false);
-                  setAiResult(null);
-                }}
-                className="ml-auto text-xs text-emerald-400/60 hover:text-emerald-300 underline underline-offset-2"
-              >
-                Undo
-              </button>
-            </div>
-          )}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="sm:col-span-2">
-            <label className="block text-sm font-medium text-white/70 mb-1.5">
-              Common Name <span className="text-red-400">*</span>
+            <label className="block text-sm font-medium text-stone-600 mb-1.5">
+              Common Name <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -360,64 +248,71 @@ export default function AddPlantPage() {
               onChange={(e) => handleChange('common_name', e.target.value)}
               placeholder="e.g. Monstera Deliciosa"
               required
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
+              className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1.5">Scientific Name</label>
+            <label className="block text-sm font-medium text-stone-600 mb-1.5">Scientific Name</label>
             <input
               type="text"
               value={formData.scientific_name}
               onChange={(e) => handleChange('scientific_name', e.target.value)}
               placeholder="e.g. Monstera deliciosa"
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
+              className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1.5">Nickname</label>
-            <input
-              type="text"
-              value={formData.nickname}
-              onChange={(e) => handleChange('nickname', e.target.value)}
-              placeholder="e.g. Big Mama"
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
-            />
+            <label className="block text-sm font-medium text-stone-600 mb-1.5">Nickname</label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={formData.nickname}
+                onChange={(e) => handleChange('nickname', e.target.value)}
+                placeholder="e.g. Big Mama"
+                className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
+              />
+              <AiNicknameButton
+                enabled={aiEnabled && !!formData.common_name}
+                plantName={formData.common_name || formData.scientific_name}
+                onGenerated={handleNicknameGenerated}
+              />
+            </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1.5">Location</label>
+            <label className="block text-sm font-medium text-stone-600 mb-1.5">Location</label>
             <input
               type="text"
               value={formData.location}
               onChange={(e) => handleChange('location', e.target.value)}
               placeholder="e.g. Living room window"
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
+              className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1.5">Adoption Date</label>
+            <label className="block text-sm font-medium text-stone-600 mb-1.5">Adoption Date</label>
             <input
               type="date"
               value={formData.adopted_at}
               onChange={(e) => handleChange('adopted_at', e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all [color-scheme:dark]"
+              className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1.5">Light Requirement</label>
+            <label className="block text-sm font-medium text-stone-600 mb-1.5">Light Requirement</label>
             <select
               value={formData.light_requirement}
               onChange={(e) => handleChange('light_requirement', e.target.value)}
               className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
             >
-              <option value="" className="bg-[#0a1f1a]">Select...</option>
+              <option value="" className="bg-white">Select...</option>
               {(Object.entries(LIGHT_REQUIREMENT_LABELS) as [LightRequirement, string][]).map(
                 ([key, label]) => (
-                  <option key={key} value={key} className="bg-[#0a1f1a]">
+                  <option key={key} value={key} className="bg-white">
                     {label}
                   </option>
                 )
@@ -426,29 +321,29 @@ export default function AddPlantPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1.5">Min Temp (°C)</label>
+            <label className="block text-sm font-medium text-stone-600 mb-1.5">Min Temp (°C)</label>
             <input
               type="number"
               value={formData.min_temp}
               onChange={(e) => handleChange('min_temp', e.target.value)}
               placeholder="e.g. 15"
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
+              className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1.5">Max Temp (°C)</label>
+            <label className="block text-sm font-medium text-stone-600 mb-1.5">Max Temp (°C)</label>
             <input
               type="number"
               value={formData.max_temp}
               onChange={(e) => handleChange('max_temp', e.target.value)}
               placeholder="e.g. 30"
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
+              className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1.5">
+            <label className="block text-sm font-medium text-stone-600 mb-1.5">
               Min Humidity (%)
             </label>
             <input
@@ -458,12 +353,12 @@ export default function AddPlantPage() {
               placeholder="e.g. 60"
               min={0}
               max={100}
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
+              className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
             />
           </div>
 
           <div className="sm:col-span-2">
-            <label className="block text-sm font-medium text-white/70 mb-1.5">Notes</label>
+            <label className="block text-sm font-medium text-stone-600 mb-1.5">Notes</label>
             <textarea
               value={formData.notes}
               onChange={(e) => handleChange('notes', e.target.value)}
@@ -478,14 +373,14 @@ export default function AddPlantPage() {
           <button
             type="button"
             onClick={() => router.back()}
-            className="rounded-xl border border-white/10 px-6 py-2.5 text-sm font-medium text-white/60 hover:text-white hover:bg-white/5 transition-all"
+            className="rounded-xl border border-stone-200/50 px-6 py-2.5 text-sm font-medium text-stone-500 hover:text-stone-800 hover:bg-stone-100/50 transition-all"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={loading || !formData.common_name}
-            className="flex-1 sm:flex-none rounded-xl bg-emerald-500 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
+            className="flex-1 sm:flex-none rounded-xl bg-emerald-500 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
@@ -498,6 +393,18 @@ export default function AddPlantPage() {
           </button>
         </div>
       </form>
+
+      {/* AI Suggestion Overlay */}
+      {showAiOverlay && (
+        <AiSuggestionOverlay
+          photoBase64={photoBase64}
+          photoMimeType={selectedPhoto?.type ?? null}
+          plantName={formData.common_name.trim()}
+          onAccept={handleAcceptSuggestion}
+          onDismiss={() => setShowAiOverlay(false)}
+          aiEnabled={aiEnabled}
+        />
+      )}
     </div>
   );
 }

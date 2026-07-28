@@ -8,9 +8,11 @@ import type { Plant, CareTask } from '@/lib/types';
 interface CopyAsPromptProps {
   plant: Plant;
   careTasks: CareTask[];
+  /** Compact icon-only mode for mobile */
+  compact?: boolean;
 }
 
-export function CopyAsPrompt({ plant, careTasks }: CopyAsPromptProps) {
+export function CopyAsPrompt({ plant, careTasks, compact = false }: CopyAsPromptProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -50,16 +52,33 @@ export function CopyAsPrompt({ plant, careTasks }: CopyAsPromptProps) {
     }
   };
 
+  if (compact) {
+    return (
+      <button
+        type="button"
+        onClick={handleCopy}
+        className="rounded-xl p-2 text-stone-400 hover:text-stone-800 hover:bg-stone-100/50 transition-all active:scale-[0.98]"
+        title="Copy as AI prompt"
+      >
+        {copied ? (
+          <ClipboardCheck className="h-4 w-4 text-emerald-600" />
+        ) : (
+          <Clipboard className="h-4 w-4" />
+        )}
+      </button>
+    );
+  }
+
   return (
     <button
       type="button"
       onClick={handleCopy}
-      className="glass-card rounded-xl px-4 py-2 text-sm text-white/60 hover:text-white hover:bg-white/10 transition-all flex items-center gap-2 active:scale-[0.98]"
+      className="glass-card rounded-xl px-4 py-2 text-sm text-stone-500 hover:text-stone-800 hover:bg-stone-100/80 transition-all flex items-center gap-2 active:scale-[0.98]"
     >
       {copied ? (
         <>
           <ClipboardCheck className="h-4 w-4 text-emerald-400" />
-          <span className="text-emerald-400">Copied!</span>
+          <span className="text-emerald-600">Copied!</span>
         </>
       ) : (
         <>

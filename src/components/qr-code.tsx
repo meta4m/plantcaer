@@ -72,7 +72,7 @@ export function QRCode({
         value={url}
         size={size}
         level="M"
-        fgColor="#e2e8f0"
+        fgColor="#1c1917"
         bgColor="transparent"
         imageSettings={{
           src: '/favicon.ico',
@@ -82,7 +82,7 @@ export function QRCode({
         }}
       />
       {!compact && plantName && (
-        <p className="text-xs text-white/50 text-center max-w-[140px] truncate">
+        <p className="text-xs text-stone-500 text-center max-w-[140px] truncate">
           {plantName}
         </p>
       )}
@@ -90,7 +90,7 @@ export function QRCode({
         <button
           type="button"
           onClick={handleDownload}
-          className="flex items-center gap-1.5 rounded-lg bg-white/5 px-3 py-1.5 text-[10px] text-white/50 hover:text-white hover:bg-white/10 transition-all"
+          className="flex items-center gap-1.5 rounded-lg bg-stone-100/50 px-3 py-1.5 text-[10px] text-stone-500 hover:text-stone-800 hover:bg-stone-200/50 transition-all"
         >
           <Download className="h-3 w-3" />
           Download PNG

@@ -12,7 +12,8 @@ async function verifyPinCookie(request: NextRequest): Promise<boolean> {
     const payload = `${parts[0]}.${parts[1]}`;
     const signature = parts[2];
 
-    const appPin = process.env.APP_PIN || 'fallback-secret';
+    // Use the same secret logic as pin-auth.ts
+    const appPin = process.env.APP_PIN || process.env.HOUSEHOLD_USER_ID || 'plantcaer-hybrid-secret';
     const data = new TextEncoder().encode(`${payload}.${appPin}`);
     const hashBuffer = await crypto.subtle.digest('SHA-256', data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
@@ -30,7 +31,6 @@ async function verifyPinCookie(request: NextRequest): Promise<boolean> {
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const isPinMode = !!process.env.APP_PIN;
 
   // Auth pages
   const isAuthPage = pathname.startsWith('/auth');
@@ -43,35 +43,11 @@ export async function middleware(request: NextRequest) {
 
   if (isStaticFile) return NextResponse.next();
 
-  // PIN mode handling
-  if (isPinMode) {
-    const hasPin = await verifyPinCookie(request);
+  // Check for PIN cookie
+  const hasPin = await verifyPinCookie(request);
 
-    // PIN auth pages
-    if (pathname === '/auth/pin') {
-      if (hasPin) {
-        return NextResponse.redirect(new URL('/', request.url));
-      }
-      return NextResponse.next();
-    }
-
-    // Auth pages (except /auth/pin and its verify endpoint) — redirect to PIN page
-    if (isAuthPage && pathname !== '/auth/pin' && pathname !== '/auth/pin/verify') {
-      return NextResponse.redirect(new URL('/auth/pin', request.url));
-    }
-
-    // Protected routes — require PIN
-    if (!hasPin) {
-      return NextResponse.redirect(new URL('/auth/pin', request.url));
-    }
-
-    // PIN is valid, allow access
-    return NextResponse.next();
-  }
-
-  // Normal Supabase Auth mode
+  // Check for Supabase session
   const response = NextResponse.next({ request });
-
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -91,15 +67,34 @@ export async function middleware(request: NextRequest) {
   );
 
   const { data: { user } } = await supabase.auth.getUser();
+  const hasSession = !!user;
 
-  // Redirect authenticated users away from auth pages
-  if (isAuthPage && user) {
-    return NextResponse.redirect(new URL('/', request.url));
+  // Determine if authenticated via either method
+  const isAuthenticated = hasPin || hasSession;
+
+  // === HYBRID AUTH LOGIC ===
+
+  // Auth pages (login, signup, pin, pin/verify)
+  if (isAuthPage) {
+    // If already authenticated, redirect to dashboard
+    if (isAuthenticated) {
+      // Don't redirect away from pin/verify since it needs to process the request
+      if (pathname === '/auth/pin/verify') {
+        return response;
+      }
+      return NextResponse.redirect(new URL('/', request.url));
+    }
+
+    // Allow access to auth pages
+    return response;
   }
 
-  // Redirect unauthenticated users to login
-  if (!isAuthPage && !user) {
-    return NextResponse.redirect(new URL('/auth/login', request.url));
+  // Protected routes — require either PIN or Supabase session
+  if (!isAuthenticated) {
+    // Redirect to login page with redirect_to for post-auth navigation
+    const loginUrl = new URL('/auth/login', request.url);
+    loginUrl.searchParams.set('redirect_to', pathname + request.nextUrl.search);
+    return NextResponse.redirect(loginUrl);
   }
 
   return response;

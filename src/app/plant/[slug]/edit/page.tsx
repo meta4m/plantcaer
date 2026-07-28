@@ -10,6 +10,53 @@ import {
   type TaskType,
   type CareTask,
 } from '@/lib/types';
+import { TaskIcon } from '@/components/ui/task-icon';
+
+/** Get PIN token from cookie (httpOnly: false, readable by client JS) */
+function getPinToken(): string | null {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.match(/(?:^|;\s*)plantcaer_pin=([^;]*)/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+/** Fetch plant data — uses API route for PIN mode, Supabase client for regular auth */
+async function fetchPlantData(slug: string): Promise<{
+  plant: Record<string, unknown>;
+  careTasks: CareTask[];
+} | null> {
+  // Try API route first (works with PIN cookie via Authorization header or cookies)
+  try {
+    const headers: Record<string, string> = {};
+    const pinToken = getPinToken();
+    if (pinToken) {
+      headers['Authorization'] = `Bearer ${pinToken}`;
+    }
+    const res = await fetch(`/api/plant/${slug}`, { headers });
+    if (res.ok) {
+      const data = await res.json();
+      return { plant: data.plant, careTasks: data.careTasks ?? [] };
+    }
+  } catch {
+    // Fall through to Supabase client
+  }
+
+  // Fallback: direct Supabase query (requires Supabase session)
+  const supabase = createClient();
+  const { data: plant } = await supabase
+    .from('plants')
+    .select('*')
+    .eq('slug', slug)
+    .single();
+
+  if (!plant) return null;
+
+  const { data: tasks } = await supabase
+    .from('care_tasks')
+    .select('*')
+    .eq('plant_id', plant.id);
+
+  return { plant, careTasks: (tasks ?? []) as CareTask[] };
+}
 
 export default function EditPlantPage({
   params,
@@ -43,35 +90,28 @@ export default function EditPlantPage({
   useEffect(() => {
     const fetchPlant = async () => {
       const slug = (await params).slug;
-      const { data: plant } = await supabase
-        .from('plants')
-        .select('*')
-        .eq('slug', slug)
-        .single();
+      const result = await fetchPlantData(slug);
 
-      if (!plant) {
+      if (!result) {
         router.push('/plants');
         return;
       }
 
-      setFormData({
-        common_name: plant.common_name || '',
-        scientific_name: plant.scientific_name || '',
-        nickname: plant.nickname || '',
-        species: plant.species || '',
-        location: plant.location || '',
-        adopted_at: plant.adopted_at || '',
-        light_requirement: (plant.light_requirement as LightRequirement) || '',
-        min_temp: plant.min_temp?.toString() || '',
-        max_temp: plant.max_temp?.toString() || '',
-        humidity_min: plant.humidity_min?.toString() || '',
-        notes: plant.notes || '',
-      });
+      const { plant, careTasks: tasks } = result;
 
-      const { data: tasks } = await supabase
-        .from('care_tasks')
-        .select('*')
-        .eq('plant_id', plant.id);
+      setFormData({
+        common_name: (plant.common_name as string) || '',
+        scientific_name: (plant.scientific_name as string) || '',
+        nickname: (plant.nickname as string) || '',
+        species: (plant.species as string) || '',
+        location: (plant.location as string) || '',
+        adopted_at: (plant.adopted_at as string) || '',
+        light_requirement: (plant.light_requirement as LightRequirement) || '',
+        min_temp: (plant.min_temp?.toString()) || '',
+        max_temp: (plant.max_temp?.toString()) || '',
+        humidity_min: (plant.humidity_min?.toString()) || '',
+        notes: (plant.notes as string) || '',
+      });
 
       if (tasks) {
         setCareTasks(
@@ -88,7 +128,7 @@ export default function EditPlantPage({
     };
 
     fetchPlant();
-  }, [params, supabase, router]);
+  }, [params, router]);
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -129,10 +169,50 @@ export default function EditPlantPage({
 
     try {
       const slug = (await params).slug;
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
 
-      // Get plant ID
+      // Try API route first (works with PIN cookie via Authorization header)
+      const putHeaders: Record<string, string> = { 'Content-Type': 'application/json' };
+      const pinToken = getPinToken();
+      if (pinToken) {
+        putHeaders['Authorization'] = `Bearer ${pinToken}`;
+      }
+      const res = await fetch(`/api/plant/${slug}`, {
+        method: 'PUT',
+        headers: putHeaders,
+        body: JSON.stringify({
+          common_name: formData.common_name,
+          scientific_name: formData.scientific_name || null,
+          nickname: formData.nickname || null,
+          species: formData.species || null,
+          location: formData.location || null,
+          adopted_at: formData.adopted_at || null,
+          light_requirement: (formData.light_requirement as LightRequirement) || null,
+          min_temp: formData.min_temp ? parseFloat(formData.min_temp) : null,
+          max_temp: formData.max_temp ? parseFloat(formData.max_temp) : null,
+          humidity_min: formData.humidity_min ? parseInt(formData.humidity_min) : null,
+          notes: formData.notes || null,
+          careTasks: careTasks.map(t => ({
+            task_type: t.task_type,
+            frequency_days: t.frequency_days,
+            amount: t.amount,
+            notes: t.notes,
+          })),
+        }),
+      });
+
+      if (res.ok) {
+        router.push(`/plant/${slug}`);
+        router.refresh();
+        return;
+      }
+
+      // Fallback: direct Supabase mutation (requires Supabase session)
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        const errData = await res.json();
+        throw new Error(errData.error || 'Not authenticated');
+      }
+
       const { data: plant } = await supabase
         .from('plants')
         .select('id')
@@ -140,7 +220,6 @@ export default function EditPlantPage({
         .single();
       if (!plant) throw new Error('Plant not found');
 
-      // Update plant
       const { error: updateError } = await supabase
         .from('plants')
         .update({
@@ -161,7 +240,6 @@ export default function EditPlantPage({
 
       if (updateError) throw updateError;
 
-      // Upsert care tasks
       for (const task of careTasks) {
         if (task.frequency_days) {
           const { error: taskError } = await supabase.from('care_tasks').upsert(
@@ -191,7 +269,7 @@ export default function EditPlantPage({
   if (fetching) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-400/30 border-t-emerald-400" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500/30 border-t-emerald-500" />
       </div>
     );
   }
@@ -208,40 +286,40 @@ export default function EditPlantPage({
   return (
     <div className="max-w-2xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white">Edit Plant</h1>
-        <p className="mt-1 text-white/50">{formData.common_name || 'Unnamed plant'}</p>
+        <h1 className="text-2xl font-bold text-stone-800 sm:text-3xl">Edit Plant</h1>
+        <p className="mt-1 text-stone-500">{formData.common_name || 'Unnamed plant'}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Basic info */}
         <div className="glass-card rounded-2xl p-6 sm:p-8 space-y-4">
-          <h2 className="text-lg font-semibold text-white">Basic Info</h2>
+          <h2 className="text-lg font-semibold text-stone-800">Basic Info</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-white/70 mb-1.5">
-                Common Name <span className="text-red-400">*</span>
+              <label className="block text-sm font-medium text-stone-600 mb-1.5">
+                Common Name <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 value={formData.common_name}
                 onChange={(e) => handleChange('common_name', e.target.value)}
                 required
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
+                className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
               />
             </div>
-            <input placeholder="Scientific name" value={formData.scientific_name} onChange={(e) => handleChange('scientific_name', e.target.value)} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all" />
-            <input placeholder="Nickname" value={formData.nickname} onChange={(e) => handleChange('nickname', e.target.value)} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all" />
-            <input placeholder="Location" value={formData.location} onChange={(e) => handleChange('location', e.target.value)} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all" />
-            <input type="date" value={formData.adopted_at} onChange={(e) => handleChange('adopted_at', e.target.value)} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all [color-scheme:dark]" />
-            <select value={formData.light_requirement} onChange={(e) => handleChange('light_requirement', e.target.value)} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all">
-              <option value="" className="bg-[#0a1f1a]">Light requirement...</option>
+            <input placeholder="Scientific name" value={formData.scientific_name} onChange={(e) => handleChange('scientific_name', e.target.value)} className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all" />
+            <input placeholder="Nickname" value={formData.nickname} onChange={(e) => handleChange('nickname', e.target.value)} className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all" />
+            <input placeholder="Location" value={formData.location} onChange={(e) => handleChange('location', e.target.value)} className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all" />
+            <input type="date" value={formData.adopted_at} onChange={(e) => handleChange('adopted_at', e.target.value)} className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all" />
+            <select value={formData.light_requirement} onChange={(e) => handleChange('light_requirement', e.target.value)} className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all">
+              <option value="" className="bg-white">Light requirement...</option>
               {(Object.entries(LIGHT_REQUIREMENT_LABELS) as [LightRequirement, string][]).map(([k, l]) => (
-                <option key={k} value={k} className="bg-[#0a1f1a]">{l}</option>
+                <option key={k} value={k} className="bg-white">{l}</option>
               ))}
             </select>
-            <input type="number" placeholder="Min temp (°C)" value={formData.min_temp} onChange={(e) => handleChange('min_temp', e.target.value)} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all" />
-            <input type="number" placeholder="Max temp (°C)" value={formData.max_temp} onChange={(e) => handleChange('max_temp', e.target.value)} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all" />
-            <input type="number" placeholder="Min humidity (%)" value={formData.humidity_min} onChange={(e) => handleChange('humidity_min', e.target.value)} min={0} max={100} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all" />
+            <input type="number" placeholder="Min temp (°C)" value={formData.min_temp} onChange={(e) => handleChange('min_temp', e.target.value)} className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all" />
+            <input type="number" placeholder="Max temp (°C)" value={formData.max_temp} onChange={(e) => handleChange('max_temp', e.target.value)} className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all" />
+            <input type="number" placeholder="Min humidity (%)" value={formData.humidity_min} onChange={(e) => handleChange('humidity_min', e.target.value)} min={0} max={100} className="w-full rounded-xl border border-stone-200/50 bg-white/80 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all" />
             <div className="sm:col-span-2">
               <textarea placeholder="Notes..." value={formData.notes} onChange={(e) => handleChange('notes', e.target.value)} rows={3} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all resize-none" />
             </div>
@@ -250,8 +328,8 @@ export default function EditPlantPage({
 
         {/* Care Tasks */}
         <div className="glass-card rounded-2xl p-6 sm:p-8 space-y-4">
-          <h2 className="text-lg font-semibold text-white">Care Schedule</h2>
-          <p className="text-sm text-white/40">Configure how often each care task should be done.</p>
+          <h2 className="text-lg font-semibold text-stone-800">Care Schedule</h2>
+          <p className="text-sm text-stone-400">Configure how often each care task should be done.</p>
 
           <div className="space-y-3">
             {allTaskTypes.map((taskType) => {
@@ -259,41 +337,41 @@ export default function EditPlantPage({
               return (
                 <div key={taskType} className="glass-card rounded-xl p-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="text-lg">{getTaskIcon(taskType)}</span>
-                    <span className="text-sm font-medium text-white">
+                    <TaskIcon type={taskType} size={18} className="flex-shrink-0" />
+                    <span className="text-sm font-medium text-stone-800">
                       {TASK_TYPE_LABELS[taskType]}
                     </span>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
-                      <label className="block text-xs text-white/40 mb-1">Frequency (days)</label>
+                      <label className="block text-xs text-stone-400 mb-1">Frequency (days)</label>
                       <input
                         type="number"
                         value={task?.frequency_days || ''}
                         onChange={(e) => updateCareTask(taskType, 'frequency_days', e.target.value)}
                         placeholder="e.g. 7"
                         min={1}
-                        className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none transition-all"
+                        className="w-full rounded-lg border border-stone-200/50 bg-white/80 px-3 py-1.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none transition-all"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-white/40 mb-1">Amount</label>
+                      <label className="block text-xs text-stone-400 mb-1">Amount</label>
                       <input
                         type="text"
                         value={task?.amount || ''}
                         onChange={(e) => updateCareTask(taskType, 'amount', e.target.value)}
                         placeholder="e.g. 200ml"
-                        className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none transition-all"
+                        className="w-full rounded-lg border border-stone-200/50 bg-white/80 px-3 py-1.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none transition-all"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-white/40 mb-1">Notes</label>
+                      <label className="block text-xs text-stone-400 mb-1">Notes</label>
                       <input
                         type="text"
                         value={task?.notes || ''}
                         onChange={(e) => updateCareTask(taskType, 'notes', e.target.value)}
                         placeholder="Optional instructions"
-                        className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:outline-none transition-all"
+                        className="w-full rounded-lg border border-stone-200/50 bg-white/80 px-3 py-1.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500/50 focus:outline-none transition-all"
                       />
                     </div>
                   </div>
@@ -304,7 +382,7 @@ export default function EditPlantPage({
         </div>
 
         {error && (
-          <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
+          <div className="rounded-xl bg-red-50 border border-red-200/50 px-4 py-3 text-sm text-red-600">
             {error}
           </div>
         )}
@@ -313,7 +391,7 @@ export default function EditPlantPage({
           <button
             type="button"
             onClick={() => router.back()}
-            className="rounded-xl border border-white/10 px-6 py-2.5 text-sm font-medium text-white/60 hover:text-white hover:bg-white/5 transition-all"
+            className="rounded-xl border border-stone-200/50 px-6 py-2.5 text-sm font-medium text-stone-500 hover:text-stone-800 hover:bg-stone-100/50 transition-all"
           >
             Cancel
           </button>
@@ -328,16 +406,4 @@ export default function EditPlantPage({
       </form>
     </div>
   );
-}
-
-function getTaskIcon(taskType: TaskType): string {
-  const icons: Record<TaskType, string> = {
-    watering: '💧',
-    fertilizing: '🌿',
-    repotting: '🪴',
-    pruning: '✂️',
-    pest_disease: '🐛',
-    propagation: '🌱',
-  };
-  return icons[taskType];
 }

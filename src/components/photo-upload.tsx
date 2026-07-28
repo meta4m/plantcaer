@@ -79,7 +79,7 @@ export function PhotoUpload({
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-white/70">
+      <label className="block text-sm font-medium text-stone-600">
         Photo
       </label>
 
@@ -95,7 +95,7 @@ export function PhotoUpload({
             type="button"
             onClick={onFileClear}
             disabled={uploading}
-            className="absolute top-2 right-2 rounded-full bg-black/60 p-1.5 text-white hover:bg-black/80 transition-all disabled:opacity-50"
+            className="absolute top-2 right-2 rounded-full bg-black/60 p-1.5 text-white hover:bg-black/70 transition-all disabled:opacity-50"
           >
             {uploading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -121,24 +121,24 @@ export function PhotoUpload({
           onClick={() => inputRef.current?.click()}
           className={`relative flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 transition-all ${
             dragOver
-              ? 'border-emerald-400 bg-emerald-500/10'
-              : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/[0.07]'
+              ? 'border-emerald-400 bg-emerald-50'
+              : 'border-stone-200/50 bg-amber-50/30 hover:border-stone-300/50 hover:bg-amber-50/60'
           }`}
         >
           <div className="flex flex-col items-center gap-3 text-center">
             {dragOver ? (
               <Upload className="h-8 w-8 text-emerald-400" />
             ) : (
-              <Camera className="h-8 w-8 text-white/40" />
+              <Camera className="h-8 w-8 text-stone-400" />
             )}
             <div>
-              <p className="text-sm font-medium text-white/60">
+              <p className="text-sm font-medium text-stone-600">
                 {dragOver ? 'Drop photo here' : 'Upload a photo'}
               </p>
-              <p className="text-xs text-white/30 mt-1">
+              <p className="text-xs text-stone-400 mt-1">
                 Tap to browse or drag & drop
               </p>
-              <p className="text-xs text-white/20 mt-1">
+              <p className="text-xs text-stone-400 mt-1">
                 JPEG, PNG, or WebP · Max 20MB · Auto-compressed
               </p>
             </div>
@@ -155,7 +155,7 @@ export function PhotoUpload({
       )}
 
       {error && (
-        <p className="text-xs text-red-400">{error}</p>
+        <p className="text-xs text-red-600">{error}</p>
       )}
     </div>
   );
